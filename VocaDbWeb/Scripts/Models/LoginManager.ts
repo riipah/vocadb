@@ -66,11 +66,19 @@ export default class LoginManager {
 		return this.loggedUser.effectivePermissions.includes(token);
 	};
 
+	public get canAccessManageMenu(): boolean {
+		return this.hasPermission(PermissionToken.AccessManageMenu);
+	}
+
 	public get canBulkDeletePVs(): boolean {
 		return this.hasPermission(PermissionToken.BulkDeletePVs);
 	}
 
 	public get canDeleteComments(): boolean {
 		return this.hasPermission(PermissionToken.DeleteComments);
+	}
+
+	public get canManageDatabase(): boolean {
+		return this.hasPermission(PermissionToken.ManageDatabase);
 	}
 }
