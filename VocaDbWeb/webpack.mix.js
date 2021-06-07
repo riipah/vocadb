@@ -34,6 +34,7 @@ mix
 		'@Models': path.join(__dirname, 'Scripts/Models'),
 		'@Repositories': path.join(__dirname, 'Scripts/Repositories'),
 		'@Shared': path.join(__dirname, 'Scripts/Shared'),
+		'@Stores': path.join(__dirname, 'Scripts/Stores'),
 		'@ViewModels': path.join(__dirname, 'Scripts/ViewModels'),
 	})
 	.eslint({

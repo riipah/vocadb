@@ -12,6 +12,7 @@ namespace VocaDb.Model.DataContracts.Users
 		public string Name { get; init; } = string.Empty;
 		public bool Active { get; init; }
 		public Guid[] EffectivePermissions { get; init; } = Array.Empty<Guid>();
+		public int UnreadMessagesCount { get; init; }
 
 		public SanitizedUserWithPermissionsContract() { }
 
@@ -21,6 +22,7 @@ namespace VocaDb.Model.DataContracts.Users
 			Name = user.Name;
 			Active = user.Active;
 			EffectivePermissions = user.EffectivePermissions.Select(p => p.Id).ToArray();
+			UnreadMessagesCount = user.UnreadMessagesCount;
 		}
 	}
 }

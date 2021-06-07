@@ -47,6 +47,10 @@ export default class LoginManager {
 		return this.values.isLoggedIn;
 	}
 
+	public get loggedUserId(): number {
+		return this.values.loggedUserId;
+	}
+
 	public get loggedUser(): UserWithPermissionsContract | undefined {
 		return this.values.loggedUser;
 	}
@@ -80,5 +84,9 @@ export default class LoginManager {
 
 	public get canManageDatabase(): boolean {
 		return this.hasPermission(PermissionToken.ManageDatabase);
+	}
+
+	public get canManageEntryReports(): boolean {
+		return this.hasPermission(PermissionToken.ManageEntryReports);
 	}
 }

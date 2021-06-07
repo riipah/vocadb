@@ -1,6 +1,14 @@
+import Container from '@Bootstrap/Container';
+import Navbar from '@Bootstrap/Navbar';
 import GlobalSearchBox from '@Components/Shared/GlobalSearchBox';
 import Footer from '@Components/Shared/Partials/Footer';
 import LeftMenu from '@Components/Shared/Partials/LeftMenu';
+import LoginManager from '@Models/LoginManager';
+import EntryReportRepository from '@Repositories/EntryReportRepository';
+import UserRepository from '@Repositories/UserRepository';
+import HttpClient from '@Shared/HttpClient';
+import UrlMapper from '@Shared/UrlMapper';
+import TopBarStore from '@Stores/TopBarStore';
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
@@ -10,18 +18,25 @@ const ErrorNotFound = React.lazy(
 	() => import('@Components/Error/ErrorNotFound'),
 );
 
+const loginManager = new LoginManager(vdb.values);
+
+const httpClient = new HttpClient();
+const urlMapper = new UrlMapper(vdb.values.baseAddress);
+const entryReportRepo = new EntryReportRepository(httpClient, urlMapper);
+const userRepo = new UserRepository(httpClient, urlMapper);
+
+const topBarStore = new TopBarStore(loginManager, entryReportRepo, userRepo);
+
 const App = (): React.ReactElement => {
 	return (
 		<BrowserRouter>
-			<div className="navbar navbar-inverse navbar-fixed-top">
-				<div className="navbar-inner">
-					<div id="topBar" className="container">
-						<GlobalSearchBox /* TODO */ />
-					</div>
-				</div>
-			</div>
+			<Navbar className="navbar-inverse" fixed="top">
+				<Container id="topBar">
+					<GlobalSearchBox store={topBarStore} />
+				</Container>
+			</Navbar>
 
-			<div className="container-fluid">
+			<Container fluid={true}>
 				<div className="row-fluid">
 					<LeftMenu />
 
@@ -33,7 +48,7 @@ const App = (): React.ReactElement => {
 						</React.Suspense>
 					</div>
 				</div>
-			</div>
+			</Container>
 
 			<Footer />
 		</BrowserRouter>

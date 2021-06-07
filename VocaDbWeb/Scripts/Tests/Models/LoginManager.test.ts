@@ -55,6 +55,7 @@ test('hasPermission disabled user', () => {
 			name: 'Disabled user',
 			active: false,
 			effectivePermissions,
+			unreadMessagesCount: 0,
 		}),
 	);
 	testHasPermission(loginManager, [PermissionToken.Nothing]);
@@ -67,6 +68,7 @@ test('hasPermission regular user', () => {
 			name: 'Regular user',
 			active: true,
 			effectivePermissions,
+			unreadMessagesCount: 0,
 		}),
 	);
 	testHasPermission(loginManager, [
@@ -83,6 +85,7 @@ test('hasPermission regular user with lockdown message', () => {
 				name: 'Regular user',
 				active: true,
 				effectivePermissions,
+				unreadMessagesCount: 0,
 			},
 			'lockdown!',
 		),

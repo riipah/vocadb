@@ -4,4 +4,5 @@ export default interface UserWithPermissionsContract {
 	name: string;
 	active: boolean;
 	effectivePermissions: string[];
+	unreadMessagesCount: number;
 }

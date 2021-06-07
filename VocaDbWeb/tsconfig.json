@@ -20,9 +20,12 @@
 			"@Models/*": ["Scripts/Models/*"],
 			"@Repositories/*": ["Scripts/Repositories/*"],
 			"@Shared/*": ["Scripts/Shared/*"],
+			"@Stores/*": ["Scripts/Stores/*"],
 			"@ViewModels/*": ["Scripts/ViewModels/*"]
 		},
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true
 	},
 	"include": ["Scripts/**/*"]
 }
