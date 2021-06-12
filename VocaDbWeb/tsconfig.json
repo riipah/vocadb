@@ -11,9 +11,11 @@
 		"forceConsistentCasingInFileNames": true,
 		"baseUrl": "./",
 		"paths": {
+			"@Bootstrap/*": ["Scripts/Bootstrap/*"],
 			"@Components/*": ["Scripts/Components/*"],
 			"@DataContracts/*": ["Scripts/DataContracts/*"],
 			"@Helpers/*": ["Scripts/Helpers/*"],
+			"@JQueryUI/*": ["Scripts/JQueryUI/*"],
 			"@KnockoutExtensions/*": ["Scripts/KnockoutExtensions/*"],
 			"@Models/*": ["Scripts/Models/*"],
 			"@Repositories/*": ["Scripts/Repositories/*"],
