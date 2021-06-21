@@ -1,11 +1,17 @@
-import RepositoryFactory from '@Repositories/RepositoryFactory';
-import HttpClient from '@Shared/HttpClient';
-import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import ResourceRepository from '@Repositories/ResourceRepository';
+import SongListRepository from '@Repositories/SongListRepository';
+import TagRepository from '@Repositories/TagRepository';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import FeaturedSongListsViewModel from '@ViewModels/SongList/FeaturedSongListsViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
+
+const vocaDbContext = container.get(VocaDbContext);
+const songListRepo = container.get(SongListRepository);
+const resourceRepo = container.get(ResourceRepository);
+const tagRepo = container.get(TagRepository);
 
 const SongListFeatured = (
 	categories: string[],
@@ -13,30 +19,20 @@ const SongListFeatured = (
 		tagId: number[];
 	},
 ): void => {
-	moment.locale(vdb.values.culture);
+	moment.locale(vocaDbContext.culture);
 	ko.punches.enableAll();
 
 	$(function () {
 		$('#createLink').button({ icons: { primary: 'ui-icon-plusthick' } });
 		$('#importLink').button({ icons: { primary: 'ui-icon-plusthick' } });
 
-		var cultureCode = vdb.values.uiCulture;
 		var tagIds = model.tagId;
 
-		var lang = vdb.values.languagePreference;
-		const httpClient = new HttpClient();
-		var rootPath = vdb.values.baseAddress;
-		var urlMapper = new UrlMapper(rootPath);
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var songListRepo = repoFactory.songListRepository();
-		var resourceRepo = repoFactory.resourceRepository();
-		var tagRepo = repoFactory.tagRepository();
 		var viewModel = new FeaturedSongListsViewModel(
+			vocaDbContext,
 			songListRepo,
 			resourceRepo,
 			tagRepo,
-			lang,
-			cultureCode,
 			tagIds,
 			categories,
 		);

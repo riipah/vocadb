@@ -1,24 +1,23 @@
-import RepositoryFactory from '@Repositories/RepositoryFactory';
-import HttpClient from '@Shared/HttpClient';
+import SongListRepository from '@Repositories/SongListRepository';
+import SongRepository from '@Repositories/SongRepository';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import SongListEditViewModel from '@ViewModels/SongList/SongListEditViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 
-function initPage(
-	repoFactory: RepositoryFactory,
-	urlMapper: UrlMapper,
-	listId: number,
-): void {
+const vocaDbContext = container.get(VocaDbContext);
+const songListRepo = container.get(SongListRepository);
+const songRepo = container.get(SongRepository);
+
+function initPage(urlMapper: UrlMapper, listId: number): void {
 	$('#tabs').tabs();
 	$('#deleteLink').button({ icons: { primary: 'ui-icon-trash' } });
 	$('#trashLink').button({ icons: { primary: 'ui-icon-trash' } });
 
-	var songListRepo = repoFactory.songListRepository();
-	var songRepo = repoFactory.songRepository();
-
 	var viewModel = new SongListEditViewModel(
+		vocaDbContext,
 		songListRepo,
 		songRepo,
 		urlMapper,
@@ -31,10 +30,8 @@ function initPage(
 
 const SongListEdit = (model: { id: number }): void => {
 	$(document).ready(function () {
-		const httpClient = new HttpClient();
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		initPage(repoFactory, urlMapper, model.id);
+		var urlMapper = new UrlMapper(vocaDbContext.baseAddress);
+		initPage(urlMapper, model.id);
 	});
 };
 

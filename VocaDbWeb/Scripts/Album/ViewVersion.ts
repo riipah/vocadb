@@ -1,9 +1,10 @@
 import AlbumRepository from '@Repositories/AlbumRepository';
-import HttpClient from '@Shared/HttpClient';
-import vdb from '@Shared/VdbStatic';
+import { container } from '@Shared/inversify.config';
 import ArchivedAlbumViewModel from '@ViewModels/Album/ArchivedAlbumViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
+
+const albumRepo = container.get(AlbumRepository);
 
 const AlbumViewVersion = (model: {
 	album: {
@@ -22,13 +23,10 @@ const AlbumViewVersion = (model: {
 		$('#showLink').button({ icons: { primary: 'ui-icon-unlocked' } });
 		$('#hideLink').button({ icons: { primary: 'ui-icon-locked' } });
 
-		const httpClient = new HttpClient();
-		var rep = new AlbumRepository(httpClient, vdb.values.baseAddress);
-
 		var viewModel = new ArchivedAlbumViewModel(
 			model.album.id,
 			model.archivedVersion.version,
-			rep,
+			albumRepo,
 		);
 		ko.applyBindings(viewModel);
 	});

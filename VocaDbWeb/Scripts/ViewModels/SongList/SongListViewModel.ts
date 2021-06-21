@@ -5,7 +5,6 @@ import TagUsageForApiContract from '@DataContracts/Tag/TagUsageForApiContract';
 import { SongOptionalField } from '@Models/EntryOptionalFields';
 import { SongOptionalFields } from '@Models/EntryOptionalFields';
 import EntryType from '@Models/EntryType';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import PVServiceIcons from '@Models/PVServiceIcons';
 import ResourcesManager from '@Models/ResourcesManager';
 import SongType from '@Models/Songs/SongType';
@@ -17,7 +16,7 @@ import UserRepository from '@Repositories/UserRepository';
 import EntryUrlMapper from '@Shared/EntryUrlMapper';
 import ui from '@Shared/MessagesTyped';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed } from 'knockout';
 import _ from 'lodash';
 
@@ -36,6 +35,7 @@ import TagsEditViewModel from '../Tag/TagsEditViewModel';
 
 export default class SongListViewModel {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		urlMapper: UrlMapper,
 		private songListRepo: SongListRepository,
 		private songRepo: SongRepository,
@@ -44,19 +44,20 @@ export default class SongListViewModel {
 		resourceRepo: ResourceRepository,
 		defaultSortRuleName: string,
 		latestComments: CommentContract[],
-		loggedUserId: number,
-		private lang: ContentLanguagePreference,
-		cultureCode: string,
 		private listId: number,
 		tagUsages: TagUsageForApiContract[],
 		pvPlayersFactory: PVPlayersFactory,
 		canDeleteAllComments: boolean,
 	) {
-		this.artistFilters = new ArtistFilters(this.artistRepo, false);
+		this.artistFilters = new ArtistFilters(
+			vocaDbContext,
+			this.artistRepo,
+			false,
+		);
 		this.comments = new EditableCommentsViewModel(
+			vocaDbContext,
 			songListRepo.getComments({}),
 			listId,
-			loggedUserId,
 			canDeleteAllComments,
 			canDeleteAllComments,
 			false,
@@ -64,7 +65,7 @@ export default class SongListViewModel {
 			true,
 		);
 
-		this.resourceManager = new ResourcesManager(resourceRepo, cultureCode);
+		this.resourceManager = new ResourcesManager(vocaDbContext, resourceRepo);
 		this.resourceManager.loadResources(null!, 'songSortRuleNames');
 		this.sortName = ko.computed(() => {
 			if (this.sort() === '') return defaultSortRuleName;
@@ -78,6 +79,7 @@ export default class SongListViewModel {
 
 		// TODO
 		this.pvPlayerViewModel = new PVPlayerViewModel(
+			vocaDbContext,
 			urlMapper,
 			songRepo,
 			userRepo,
@@ -97,12 +99,12 @@ export default class SongListViewModel {
 			this.sort,
 		);
 		this.playlistViewModel = new PlayListViewModel(
+			vocaDbContext,
 			urlMapper,
 			playListRepoAdapter,
 			songRepo,
 			userRepo,
 			this.pvPlayerViewModel,
-			lang,
 		);
 		this.pvServiceIcons = new PVServiceIcons(urlMapper);
 
@@ -225,7 +227,7 @@ export default class SongListViewModel {
 				paging: pagingProperties,
 				fields: new SongOptionalFields(fields),
 				sort: this.sort(),
-				lang: vdb.values.languagePreference,
+				lang: this.vocaDbContext.languagePreference,
 			})
 			.then((result) => {
 				_.each(result.items, (item) => {

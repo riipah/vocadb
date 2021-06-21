@@ -1,10 +1,10 @@
 import VenueRepository from '@Repositories/VenueRepository';
-import HttpClient from '@Shared/HttpClient';
-import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import { container } from '@Shared/inversify.config';
 import ArchivedEntryViewModel from '@ViewModels/ArchivedEntryViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
+
+const venueRepo = container.get(VenueRepository);
 
 const VenueViewVersion = (model: {
 	entry: {
@@ -24,15 +24,10 @@ const VenueViewVersion = (model: {
 		$('#showLink').button({ icons: { primary: 'ui-icon-unlocked' } });
 		$('#hideLink').button({ icons: { primary: 'ui-icon-locked' } });
 
-		const httpClient = new HttpClient();
-		var rep = new VenueRepository(
-			httpClient,
-			new UrlMapper(vdb.values.baseAddress),
-		);
 		var viewModel = new ArchivedEntryViewModel(
 			model.entry.venue.id,
 			model.entry.archivedVersion.version,
-			rep,
+			venueRepo,
 		);
 		ko.applyBindings(viewModel);
 	});

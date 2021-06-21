@@ -1,11 +1,15 @@
 import TagRepository from '@Repositories/TagRepository';
 import UserRepository from '@Repositories/UserRepository';
-import HttpClient from '@Shared/HttpClient';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import TagEditViewModel from '@ViewModels/TagEditViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
+
+const vocaDbContext = container.get(VocaDbContext);
+const tagRepo = container.get(TagRepository);
+const userRepo = container.get(UserRepository);
 
 function initPage(): void {
 	$('#trashLink').button({ icons: { primary: 'ui-icon-trash' } });
@@ -17,17 +21,14 @@ const TagEdit = (model: { id: number }): void => {
 	$(document).ready(function () {
 		initPage();
 
-		const httpClient = new HttpClient();
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
-		var tagRepo = new TagRepository(httpClient, vdb.values.baseAddress);
-		var userRepo = new UserRepository(httpClient, urlMapper);
+		var urlMapper = new UrlMapper(vocaDbContext.baseAddress);
 
 		tagRepo
 			.getById({
 				id: model.id,
 				fields:
 					'AliasedTo,TranslatedDescription,Names,Parent,RelatedTags,WebLinks',
-				lang: vdb.values.languagePreference,
+				lang: vocaDbContext.languagePreference,
 			})
 			.then(function (contract) {
 				var viewModel = new TagEditViewModel(urlMapper, userRepo, contract);

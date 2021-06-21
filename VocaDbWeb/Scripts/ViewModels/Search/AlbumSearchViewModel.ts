@@ -1,10 +1,9 @@
 import AlbumContract from '@DataContracts/Album/AlbumContract';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import ResourcesManager from '@Models/ResourcesManager';
 import AlbumRepository from '@Repositories/AlbumRepository';
 import ArtistRepository from '@Repositories/ArtistRepository';
 import ResourceRepository from '@Repositories/ResourceRepository';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed, Observable } from 'knockout';
 import _ from 'lodash';
 
@@ -15,12 +14,11 @@ import SearchViewModel from './SearchViewModel';
 export default class AlbumSearchViewModel extends SearchCategoryBaseViewModel<AlbumContract> {
 	public constructor(
 		searchViewModel: SearchViewModel,
+		vocaDbContext: VocaDbContext,
 		private unknownPictureUrl: string,
-		lang: ContentLanguagePreference,
 		private albumRepo: AlbumRepository,
 		private artistRepo: ArtistRepository,
 		resourceRep: ResourceRepository,
-		cultureCode: string,
 		sort: string,
 		artistId: number[],
 		childVoicebanks: boolean,
@@ -32,7 +30,7 @@ export default class AlbumSearchViewModel extends SearchCategoryBaseViewModel<Al
 		if (searchViewModel) {
 			this.resourceManager = searchViewModel.resourcesManager;
 		} else {
-			this.resourceManager = new ResourcesManager(resourceRep, cultureCode);
+			this.resourceManager = new ResourcesManager(vocaDbContext, resourceRep);
 			this.resourceManager.loadResources(
 				null!,
 				'albumSortRuleNames',
@@ -41,7 +39,11 @@ export default class AlbumSearchViewModel extends SearchCategoryBaseViewModel<Al
 		}
 
 		this.advancedFilters.filters.subscribe(this.updateResultsWithTotalCount);
-		this.artistFilters = new ArtistFilters(this.artistRepo, childVoicebanks);
+		this.artistFilters = new ArtistFilters(
+			vocaDbContext,
+			this.artistRepo,
+			childVoicebanks,
+		);
 		this.artistFilters.selectArtists(artistId);
 
 		this.albumType = ko.observable(albumType || 'Unknown');
@@ -71,7 +73,7 @@ export default class AlbumSearchViewModel extends SearchCategoryBaseViewModel<Al
 			this.albumRepo
 				.getList({
 					paging: pagingProperties,
-					lang: vdb.values.languagePreference,
+					lang: vocaDbContext.languagePreference,
 					query: searchTerm,
 					sort: this.sort(),
 					discTypes: this.albumType(),

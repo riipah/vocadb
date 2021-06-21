@@ -2,7 +2,7 @@ import ArtistHelper from '@Helpers/ArtistHelper';
 import { ArtistAutoCompleteParams } from '@KnockoutExtensions/AutoCompleteParams';
 import ArtistType from '@Models/Artists/ArtistType';
 import ArtistRepository from '@Repositories/ArtistRepository';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed, Observable } from 'knockout';
 import _ from 'lodash';
 
@@ -12,6 +12,7 @@ import ArtistFilter from './ArtistFilter';
 // These can be used wherever artist filtering is needed - search page, rated songs page, song list page
 export default class ArtistFilters {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private readonly artistRepo: ArtistRepository,
 		childVoicebanks?: boolean,
 	) {
@@ -70,7 +71,7 @@ export default class ArtistFilters {
 			this.artistRepo
 				.getOne({
 					id: selectedArtistId,
-					lang: vdb.values.languagePreference,
+					lang: this.vocaDbContext.languagePreference,
 				})
 				.then((artist) => {
 					newArtist.name(artist.name);

@@ -14,6 +14,7 @@ import '@KnockoutExtensions/Show';
 export { default as EntryReportRepository } from '@Repositories/EntryReportRepository';
 export { default as UserRepository } from '@Repositories/UserRepository';
 export { default as TopBarViewModel } from '@ViewModels/TopBarViewModel';
+export { default as SharedLayoutScripts } from '@Shared/SharedLayoutScripts';
 
 // ~/bundles/shared/main
 export { default as EntryUrlMapper } from '@Shared/EntryUrlMapper';
@@ -29,7 +30,6 @@ import '@KnockoutExtensions/Bootstrap/Tooltip';
 import '@KnockoutExtensions/qTip';
 import '@KnockoutExtensions/TagAutoComplete';
 import '@KnockoutExtensions/Filters/Truncate';
-export { default as RepositoryFactory } from '@Repositories/RepositoryFactory';
 export { default as TagRepository } from '@Repositories/TagRepository';
 export { default as ResourceRepository } from '@Repositories/ResourceRepository';
 export { default as SongRepository } from '@Repositories/SongRepository';

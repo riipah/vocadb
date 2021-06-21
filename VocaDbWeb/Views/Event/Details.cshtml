@@ -216,7 +216,7 @@
 	</div>
 }
 
-<h3 data-bind="visible: loggedUserId || usersAttending().length" class="withMargin">@Res.Attending</h3>
+<h3 data-bind="visible: vocaDbContext.loggedUserId || usersAttending().length" class="withMargin">@Res.Attending</h3>
 
 @if (Login.IsLoggedIn) {
 	<div class="btn-group" data-bind="visible: hasEvent">

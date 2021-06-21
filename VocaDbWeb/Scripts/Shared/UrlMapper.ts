@@ -1,26 +1,12 @@
-import _ from 'lodash';
+import { buildUrl, mergeUrls } from '@Repositories/BaseRepository';
 
 import functions from './GlobalFunctions';
 
 export default class UrlMapper {
-	public static buildUrl = (...args: string[]): string => {
-		return _.reduce(args, (list: string, item: string) =>
-			UrlMapper.mergeUrls(list, item),
-		)!;
-	};
+	public static buildUrl = (...args: string[]): string => buildUrl(...args);
 
-	public static mergeUrls = (base: string, relative: string): string => {
-		if (base.charAt(base.length - 1) === '/' && relative.charAt(0) === '/')
-			return base + relative.substr(1);
-
-		if (base.charAt(base.length - 1) === '/' && relative.charAt(0) !== '/')
-			return base + relative;
-
-		if (base.charAt(base.length - 1) !== '/' && relative.charAt(0) === '/')
-			return base + relative;
-
-		return base + '/' + relative;
-	};
+	public static mergeUrls = (base: string, relative: string): string =>
+		mergeUrls(base, relative);
 
 	public constructor(public baseUrl: string) {}
 

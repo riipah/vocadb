@@ -1,5 +1,6 @@
 import CommentContract from '@DataContracts/CommentContract';
 import ICommentRepository from '@Repositories/ICommentRepository';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed, ObservableArray } from 'knockout';
 import _ from 'lodash';
 
@@ -9,9 +10,9 @@ import ServerSidePagingViewModel from './ServerSidePagingViewModel';
 // Viewmodel for a list of comments where comments can be edited and new comments posted (with sufficient permissions).
 export default class EditableCommentsViewModel {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private repo: ICommentRepository,
 		private entryId: number,
-		private loggedUserId: number,
 		private canDeleteAllComments: boolean,
 		private canEditAllComments: boolean,
 		private ascending: boolean,
@@ -47,14 +48,14 @@ export default class EditableCommentsViewModel {
 		return (
 			this.canDeleteAllComments ||
 			this.canEditAllComments ||
-			(comment.author && comment.author.id === this.loggedUserId)
+			(comment.author && comment.author.id === this.vocaDbContext.loggedUserId)
 		);
 	};
 
 	private canEditComment = (comment: CommentContract): boolean => {
 		return (
 			this.canEditAllComments ||
-			(comment.author && comment.author.id === this.loggedUserId)
+			(comment.author && comment.author.id === this.vocaDbContext.loggedUserId)
 		);
 	};
 
@@ -71,7 +72,7 @@ export default class EditableCommentsViewModel {
 		this.newComment('');
 
 		var commentContract: CommentContract = {
-			author: { id: this.loggedUserId },
+			author: { id: this.vocaDbContext.loggedUserId },
 			message: comment,
 		};
 

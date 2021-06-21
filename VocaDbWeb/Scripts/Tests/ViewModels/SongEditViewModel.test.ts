@@ -2,6 +2,8 @@ import SongForEditContract from '@DataContracts/Song/SongForEditContract';
 import TranslatedEnumField from '@DataContracts/TranslatedEnumField';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import ArtistForAlbumEditViewModel from '@ViewModels/ArtistForAlbumEditViewModel';
 import SongEditViewModel from '@ViewModels/Song/SongEditViewModel';
 import moment from 'moment';
@@ -9,6 +11,8 @@ import moment from 'moment';
 import FakeArtistRepository from '../TestSupport/FakeArtistRepository';
 import FakeSongRepository from '../TestSupport/FakeSongRepository';
 import FakeUserRepository from '../TestSupport/FakeUserRepository';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 var categories: TranslatedEnumField[] = [
 	{ id: 'Official', name: 'Official' },
@@ -57,6 +61,7 @@ beforeEach(() => {
 
 function createViewModel(): SongEditViewModel {
 	return new SongEditViewModel(
+		vocaDbContext,
 		songRepo,
 		artistRepo,
 		pvRepo,

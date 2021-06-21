@@ -1,12 +1,15 @@
 import UserRepository from '@Repositories/UserRepository';
-import HttpClient from '@Shared/HttpClient';
 import ui from '@Shared/MessagesTyped';
-import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import NewsListViewModel from '@ViewModels/NewsListViewModel';
 import PVRatingButtonsViewModel from '@ViewModels/PVRatingButtonsViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
+
+const vocaDbContext = container.get(VocaDbContext);
+const userRepo = container.get(UserRepository);
 
 declare global {
 	interface JQuery {
@@ -16,9 +19,6 @@ declare global {
 
 function initPage(): void {
 	function initRatingButtons(): void {
-		const httpClient = new HttpClient();
-		const urlMapper = new UrlMapper(vdb.values.baseAddress);
-		const repo = new UserRepository(httpClient, urlMapper);
 		const ratingBar = $('#rating-bar');
 
 		if (!ratingBar.length) {
@@ -28,12 +28,12 @@ function initPage(): void {
 		const songId = ratingBar.data('song-id');
 		const rating = ratingBar.data('rating');
 		const viewModel = new PVRatingButtonsViewModel(
-			repo,
+			userRepo,
 			{ id: songId, vote: rating },
 			() => {
 				ui.showSuccessMessage(vdb.resources.song.thanksForRating);
 			},
-			vdb.values.isLoggedIn,
+			vocaDbContext.isLoggedIn,
 		);
 		ko.applyBindings(viewModel, ratingBar[0]);
 	}

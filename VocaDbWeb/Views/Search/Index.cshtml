@@ -124,7 +124,7 @@
 			<div class="controls">
 				
 				<div data-bind="visible: showArtistSearch, with: artistSearchViewModel">
-					<label class="checkbox" data-bind="visible: loggedUserId">
+					<label class="checkbox" data-bind="visible: vocaDbContext.loggedUserId">
 						<input type="checkbox" data-bind="checked: onlyFollowedByMe" />
 						@Res.OnlyMyFollowedArtists
 					</label>
@@ -136,14 +136,14 @@
 						@Res.OnlyWithPVs
 					</label>
 
-					<label class="checkbox" data-bind="visible: loggedUserId">
+					<label class="checkbox" data-bind="visible: vocaDbContext.loggedUserId">
 						<input type="checkbox" data-bind="checked: onlyRatedSongs" />
 						@Res.InMyCollection
 					</label>
 				</div>
 				
 				<div data-bind="visible: showEventSearch, with: eventSearchViewModel">
-					<label class="checkbox" data-bind="visible: loggedUserId">
+					<label class="checkbox" data-bind="visible: vocaDbContext.loggedUserId">
 						<input type="checkbox" data-bind="checked: onlyMyEvents" />
 						@Res.OnlyMyEvents
 					</label>

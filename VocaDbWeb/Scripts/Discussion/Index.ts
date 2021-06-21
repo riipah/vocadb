@@ -1,28 +1,28 @@
-import RepositoryFactory from '@Repositories/RepositoryFactory';
-import HttpClient from '@Shared/HttpClient';
+import DiscussionRepository from '@Repositories/DiscussionRepository';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import DiscussionIndexViewModel from '@ViewModels/Discussion/DiscussionIndexViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
 
+const vocaDbContext = container.get(VocaDbContext);
+const discussionRepo = container.get(DiscussionRepository);
+
 const DiscussionIndex = (canDeleteAllComments: boolean): void => {
 	$(function () {
-		moment.locale(vdb.values.culture);
+		moment.locale(vocaDbContext.culture);
 
 		ko.punches.enableAll();
 
-		const httpClient = new HttpClient();
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var repo = repoFactory.discussionRepository();
+		var urlMapper = new UrlMapper(vocaDbContext.baseAddress);
 		ko.applyBindings(
 			new DiscussionIndexViewModel(
-				repo,
+				vocaDbContext,
+				discussionRepo,
 				urlMapper,
 				canDeleteAllComments,
-				vdb.values.loggedUserId,
 			),
 		);
 	});

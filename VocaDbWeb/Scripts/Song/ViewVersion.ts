@@ -1,9 +1,10 @@
 import SongRepository from '@Repositories/SongRepository';
-import HttpClient from '@Shared/HttpClient';
-import vdb from '@Shared/VdbStatic';
+import { container } from '@Shared/inversify.config';
 import ArchivedSongViewModel from '@ViewModels/Song/ArchivedSongViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
+
+const songRepo = container.get(SongRepository);
 
 const SongViewVersion = (model: {
 	archivedVersion: {
@@ -22,13 +23,10 @@ const SongViewVersion = (model: {
 		$('#showLink').button({ icons: { primary: 'ui-icon-unlocked' } });
 		$('#hideLink').button({ icons: { primary: 'ui-icon-locked' } });
 
-		const httpClient = new HttpClient();
-		var rep = new SongRepository(httpClient, vdb.values.baseAddress);
-
 		var viewModel = new ArchivedSongViewModel(
 			model.song.id,
 			model.archivedVersion.version,
-			rep,
+			songRepo,
 		);
 		ko.applyBindings(viewModel);
 	});

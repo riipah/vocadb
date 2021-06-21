@@ -1,9 +1,12 @@
 import UserRepository from '@Repositories/UserRepository';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
 import $ from 'jquery';
 
-import HttpClient from './HttpClient';
+import VocaDbContext from './VocaDbContext';
+import { container } from './inversify.config';
+
+const vocaDbContext = container.get(VocaDbContext);
+const userRepo = container.get(UserRepository);
 
 $(() => {
 	$('#globalSearchTerm').autocomplete({
@@ -11,7 +14,7 @@ $(() => {
 			request: { term: string },
 			response: (items: string[]) => void,
 		) => {
-			var urlMapper = new UrlMapper(vdb.values.baseAddress);
+			var urlMapper = new UrlMapper(vocaDbContext.baseAddress);
 			var term: string = request.term;
 			var entryType = $('#globalSearchObjectType').val();
 			var endpoint: string = null!;
@@ -56,14 +59,9 @@ $(() => {
 export function setLanguagePreferenceCookie(
 	languagePreference: string,
 ): boolean {
-	const httpClient = new HttpClient();
-	var userRepo = new UserRepository(
-		httpClient,
-		new UrlMapper(vdb.values.baseAddress),
-	);
 	userRepo
 		.updateUserSetting({
-			userId: vdb.values.loggedUserId,
+			userId: vocaDbContext.loggedUserId,
 			settingName: 'languagePreference',
 			value: languagePreference,
 		})

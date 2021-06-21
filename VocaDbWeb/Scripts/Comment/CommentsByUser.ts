@@ -1,32 +1,27 @@
 import ResourceRepository from '@Repositories/ResourceRepository';
-import HttpClient from '@Shared/HttpClient';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import CommentListViewModel from '@ViewModels/Comment/CommentListViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
 
+const vocaDbContext = container.get(VocaDbContext);
+const resourceRepo = container.get(ResourceRepository);
+
 const CommentCommentsByUser = (model: { id: number }): void => {
 	$(function () {
-		moment.locale(vdb.values.culture);
+		moment.locale(vocaDbContext.culture);
 		ko.punches.enableAll();
 
-		const httpClient = new HttpClient();
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
-		var resourceRepo = new ResourceRepository(
-			httpClient,
-			vdb.values.baseAddress,
-		);
-		var lang = vdb.values.languagePreference;
-		var cultureCode = vdb.values.uiCulture;
+		var urlMapper = new UrlMapper(vocaDbContext.baseAddress);
 		var userId = model.id;
 
 		var vm = new CommentListViewModel(
+			vocaDbContext,
 			urlMapper,
 			resourceRepo,
-			lang,
-			cultureCode,
 			userId,
 		);
 		ko.applyBindings(vm);

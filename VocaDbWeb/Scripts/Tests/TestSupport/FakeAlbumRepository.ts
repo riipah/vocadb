@@ -6,6 +6,6 @@ export default class FakeAlbumRepository extends AlbumRepository {
 	public updatedId!: number;
 
 	public constructor() {
-		super(new HttpClient(), '');
+		super(new HttpClient());
 	}
 }

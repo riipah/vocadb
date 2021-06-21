@@ -1,27 +1,28 @@
-import RepositoryFactory from '@Repositories/RepositoryFactory';
-import HttpClient from '@Shared/HttpClient';
+import SongRepository from '@Repositories/SongRepository';
+import UserRepository from '@Repositories/UserRepository';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import RankingsViewModel from '@ViewModels/Song/RankingsViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
 
+const vocaDbContext = container.get(VocaDbContext);
+const songRepo = container.get(SongRepository);
+const userRepo = container.get(UserRepository);
+
 const SongRankings = (): void => {
-	moment.locale(vdb.values.culture);
+	moment.locale(vocaDbContext.culture);
 	ko.punches.enableAll();
 
 	$(function () {
-		const httpClient = new HttpClient();
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var songRepo = repoFactory.songRepository();
-		var userRepo = repoFactory.userRepository();
+		var urlMapper = new UrlMapper(vocaDbContext.baseAddress);
 		var viewModel = new RankingsViewModel(
 			urlMapper,
 			songRepo,
 			userRepo,
-			vdb.values.languagePreference,
+			vocaDbContext.languagePreference,
 		);
 		ko.applyBindings(viewModel);
 	});

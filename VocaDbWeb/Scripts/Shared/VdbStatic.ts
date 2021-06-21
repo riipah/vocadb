@@ -1,4 +1,4 @@
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
+import VocaDbContext from './VocaDbContext';
 
 interface VdbFunctionsStatic {
 	boldCaseInsensitive: (text: string, term: string) => string;
@@ -19,35 +19,17 @@ interface VdbResourcesStatic {
 	};
 }
 
-interface VdbValuesStatic {
-	/** URL of the site path, for example "/" */
-	baseAddress: string;
-
-	/** Whether the user is logged in. */
-	isLoggedIn: boolean;
-
-	loggedUserId: number;
-
-	languagePreference: ContentLanguagePreference;
-
-	culture: string;
-
-	/** UI language code, for example "en" */
-	uiCulture: string;
-}
-
 interface VdbStatic {
 	functions: VdbFunctionsStatic;
 	resources: VdbResourcesStatic;
-	values: VdbValuesStatic;
+	values: VocaDbContext;
 }
 
-const vdb = {
-	values: {
-		loggedUserId: 0,
-		languagePreference: ContentLanguagePreference.Default,
-	},
-} as VdbStatic;
+const vdb: VdbStatic = {
+	functions: {} as VdbFunctionsStatic,
+	resources: {} as VdbResourcesStatic,
+	values: new VocaDbContext(),
+};
 
 export default vdb;
 

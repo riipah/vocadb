@@ -4,7 +4,7 @@ import SongRepository from '@Repositories/SongRepository';
 import UserRepository from '@Repositories/UserRepository';
 import ui from '@Shared/MessagesTyped';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Observable } from 'knockout';
 import _ from 'lodash';
 
@@ -16,6 +16,7 @@ export default class PVPlayerViewModel {
 		'File, LocalFile, NicoNicoDouga, SoundCloud, Youtube';
 
 	public constructor(
+		vocaDbContext: VocaDbContext,
 		private urlMapper: UrlMapper,
 		private songRepo: SongRepository,
 		userRepo: UserRepository,
@@ -43,7 +44,7 @@ export default class PVPlayerViewModel {
 
 			userRepo
 				.getSongRating({
-					userId: vdb.values.loggedUserId,
+					userId: vocaDbContext.loggedUserId,
 					songId: song.song.id,
 				})
 				.then((rating) => {

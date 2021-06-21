@@ -1,7 +1,6 @@
 import TagBaseContract from '@DataContracts/Tag/TagBaseContract';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import TagRepository from '@Repositories/TagRepository';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed, Observable, ObservableArray } from 'knockout';
 import _ from 'lodash';
 
@@ -10,8 +9,8 @@ import TagFilter from './TagFilter';
 // Manages tag filters for search
 export default class TagFilters {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private tagRepo: TagRepository,
-		private lang: ContentLanguagePreference,
 		tags: ObservableArray<TagFilter> = null!,
 	) {
 		this.tags = tags || ko.observableArray<TagFilter>();
@@ -44,7 +43,7 @@ export default class TagFilters {
 				.getById({
 					id: selectedTagId,
 					fields: undefined,
-					lang: vdb.values.languagePreference,
+					lang: this.vocaDbContext.languagePreference,
 				})
 				.then((tag) => {
 					newTag.name(tag.name);

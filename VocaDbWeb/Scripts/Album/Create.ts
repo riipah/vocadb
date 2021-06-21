@@ -1,20 +1,20 @@
-import RepositoryFactory from '@Repositories/RepositoryFactory';
-import HttpClient from '@Shared/HttpClient';
-import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import AlbumRepository from '@Repositories/AlbumRepository';
+import ArtistRepository from '@Repositories/ArtistRepository';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import AlbumCreateViewModel from '@ViewModels/Album/AlbumCreateViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 
+const vocaDbContext = container.get(VocaDbContext);
+const albumRepo = container.get(AlbumRepository);
+const artistRepo = container.get(ArtistRepository);
+
 const AlbumCreate = (): void => {
 	$(function () {
-		const httpClient = new HttpClient();
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var albumRepo = repoFactory.albumRepository();
-		var artistRepo = repoFactory.artistRepository();
-
-		ko.applyBindings(new AlbumCreateViewModel(albumRepo, artistRepo));
+		ko.applyBindings(
+			new AlbumCreateViewModel(vocaDbContext, albumRepo, artistRepo),
+		);
 	});
 };
 

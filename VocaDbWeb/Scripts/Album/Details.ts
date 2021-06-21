@@ -1,8 +1,11 @@
-import RepositoryFactory from '@Repositories/RepositoryFactory';
-import HttpClient from '@Shared/HttpClient';
+import AlbumRepository from '@Repositories/AlbumRepository';
+import ArtistRepository from '@Repositories/ArtistRepository';
+import UserRepository from '@Repositories/UserRepository';
 import ui from '@Shared/MessagesTyped';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import AlbumDetailsViewModel, {
 	AlbumDetailsAjax,
 } from '@ViewModels/Album/AlbumDetailsViewModel';
@@ -10,6 +13,11 @@ import { IEntryReportType } from '@ViewModels/ReportEntryViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
+
+const vocaDbContext = container.get(VocaDbContext);
+const albumRepo = container.get(AlbumRepository);
+const userRepo = container.get(UserRepository);
+const artistRepo = container.get(ArtistRepository);
 
 function initAlbumDetailsPage(
 	albumId: number,
@@ -161,15 +169,10 @@ const AlbumDetails = (
 	showTranslatedDescription: boolean,
 ): void => {
 	$(document).ready(function () {
-		moment.locale(vdb.values.culture);
+		moment.locale(vocaDbContext.culture);
 		ko.punches.enableAll();
 
-		const httpClient = new HttpClient();
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var albumRepo = repoFactory.albumRepository();
-		var userRepo = repoFactory.userRepository();
-		var artistRepo = repoFactory.artistRepository();
+		var urlMapper = new UrlMapper(vocaDbContext.baseAddress);
 
 		vdb.resources.album = {
 			addedToCollection: addedToCollection,
@@ -178,13 +181,12 @@ const AlbumDetails = (
 
 		var jsonModel = model.jsonModel;
 		var viewModel = new AlbumDetailsViewModel(
+			vocaDbContext,
 			albumRepo,
 			userRepo,
 			artistRepo,
 			jsonModel,
 			reportTypes,
-			vdb.values.loggedUserId,
-			vdb.values.languagePreference,
 			canDeleteAllComments,
 			formatString,
 			showTranslatedDescription,

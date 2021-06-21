@@ -1,13 +1,14 @@
 import ArtistApiContract from '@DataContracts/Artist/ArtistApiContract';
 import ArtistContract from '@DataContracts/Artist/ArtistContract';
 import ArtistRepository from '@Repositories/ArtistRepository';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Observable } from 'knockout';
 
 import BasicEntryLinkViewModel from './BasicEntryLinkViewModel';
 
 export default class SelfDescriptionViewModel {
 	public constructor(
+		vocaDbContext: VocaDbContext,
 		author: ArtistApiContract,
 		text: string,
 		artistRepo: ArtistRepository,
@@ -21,7 +22,7 @@ export default class SelfDescriptionViewModel {
 					.getOneWithComponents({
 						id: artistId,
 						fields: 'MainPicture',
-						lang: vdb.values.languagePreference,
+						lang: vocaDbContext.languagePreference,
 					})
 					.then((artist) => {
 						callback(artist);

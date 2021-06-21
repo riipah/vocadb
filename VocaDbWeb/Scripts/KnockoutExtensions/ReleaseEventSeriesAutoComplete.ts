@@ -3,8 +3,11 @@ import IEntryWithIdAndName from '@Models/IEntryWithIdAndName';
 import { EntryAutoCompleteParams } from '@Shared/EntryAutoComplete';
 import { initEntrySearch } from '@Shared/EntryAutoComplete';
 import functions from '@Shared/GlobalFunctions';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import ko from 'knockout';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 declare global {
 	interface KnockoutBindingHandlers {
@@ -27,7 +30,7 @@ ko.bindingHandlers.releaseEventSeriesAutoComplete = {
 		var queryParams = {
 			nameMatchMode: 'Auto',
 			preferAccurateMatches: true,
-			lang: ContentLanguagePreference[vdb.values.languagePreference],
+			lang: ContentLanguagePreference[vocaDbContext.languagePreference],
 			maxResults: 20,
 			sort: 'Name',
 		};

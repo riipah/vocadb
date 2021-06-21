@@ -1,9 +1,9 @@
 import PartialFindResultContract from '@DataContracts/PartialFindResultContract';
 import SongListContract from '@DataContracts/Song/SongListContract';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import ResourceRepository from '@Repositories/ResourceRepository';
 import SongListRepository from '@Repositories/SongListRepository';
 import TagRepository from '@Repositories/TagRepository';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko from 'knockout';
 import _ from 'lodash';
 
@@ -11,21 +11,19 @@ import SongListsBaseViewModel from './SongListsBaseViewModel';
 
 export default class FeaturedSongListsViewModel {
 	public constructor(
+		vocaDbContext: VocaDbContext,
 		listRepo: SongListRepository,
 		resourceRepo: ResourceRepository,
 		tagRepo: TagRepository,
-		lang: ContentLanguagePreference,
-		cultureCode: string,
 		tagIds: number[],
 		categoryNames: string[],
 	) {
 		_.forEach(categoryNames, (categoryName) => {
 			this.categories[categoryName] = new FeaturedSongListCategoryViewModel(
+				vocaDbContext,
 				listRepo,
 				resourceRepo,
 				tagRepo,
-				lang,
-				cultureCode,
 				tagIds,
 				categoryName,
 			);
@@ -54,20 +52,18 @@ export default class FeaturedSongListsViewModel {
 
 export class FeaturedSongListCategoryViewModel extends SongListsBaseViewModel {
 	public constructor(
+		vocaDbContext: VocaDbContext,
 		private listRepo: SongListRepository,
 		resourceRepo: ResourceRepository,
 		tagRepo: TagRepository,
-		lang: ContentLanguagePreference,
-		cultureCode: string,
 		tagIds: number[],
 		private category: string,
 	) {
 		// Should figure out a better way for this.
 		super(
+			vocaDbContext,
 			resourceRepo,
 			tagRepo,
-			lang,
-			cultureCode,
 			tagIds,
 			category === 'Concerts' || category === 'VocaloidRanking',
 		);

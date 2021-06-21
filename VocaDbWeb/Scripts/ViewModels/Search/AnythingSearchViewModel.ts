@@ -1,9 +1,8 @@
 import EntryContract from '@DataContracts/EntryContract';
 import EntryType from '@Models/EntryType';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import EntryRepository from '@Repositories/EntryRepository';
 import EntryUrlMapper from '@Shared/EntryUrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko from 'knockout';
 
 import SearchCategoryBaseViewModel from './SearchCategoryBaseViewModel';
@@ -12,7 +11,7 @@ import SearchViewModel from './SearchViewModel';
 export default class AnythingSearchViewModel extends SearchCategoryBaseViewModel<EntryContract> {
 	public constructor(
 		searchViewModel: SearchViewModel,
-		lang: ContentLanguagePreference,
+		vocaDbContext: VocaDbContext,
 		private entryRepo: EntryRepository,
 	) {
 		super(searchViewModel);
@@ -28,7 +27,7 @@ export default class AnythingSearchViewModel extends SearchCategoryBaseViewModel
 			this.entryRepo
 				.getList({
 					paging: pagingProperties,
-					lang: vdb.values.languagePreference,
+					lang: vocaDbContext.languagePreference,
 					query: searchTerm,
 					tags: tags,
 					childTags: childTags,

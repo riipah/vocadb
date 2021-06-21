@@ -2,12 +2,16 @@ import LocalizedStringWithIdContract from '@DataContracts/Globalization/Localize
 import WebLinkContract from '@DataContracts/WebLinkContract';
 import ReleaseEventRepository from '@Repositories/ReleaseEventRepository';
 import UserRepository from '@Repositories/UserRepository';
-import HttpClient from '@Shared/HttpClient';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import ReleaseEventSeriesEditViewModel from '@ViewModels/ReleaseEvent/ReleaseEventSeriesEditViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
+
+const vocaDbContext = container.get(VocaDbContext);
+const eventRepo = container.get(ReleaseEventRepository);
+const userRepo = container.get(UserRepository);
 
 function initPage(): void {
 	$('#deleteLink').button({ icons: { primary: 'ui-icon-trash' } });
@@ -22,10 +26,7 @@ const EventEditSeries = (model: {
 	webLinks: WebLinkContract[];
 }): void => {
 	$(function () {
-		const httpClient = new HttpClient();
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
-		var eventRepo = new ReleaseEventRepository(httpClient, urlMapper);
-		var userRepo = new UserRepository(httpClient, urlMapper);
+		var urlMapper = new UrlMapper(vocaDbContext.baseAddress);
 
 		var vm = new ReleaseEventSeriesEditViewModel(
 			eventRepo,

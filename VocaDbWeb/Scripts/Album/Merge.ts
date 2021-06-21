@@ -1,15 +1,16 @@
 import AlbumRepository from '@Repositories/AlbumRepository';
-import HttpClient from '@Shared/HttpClient';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import AlbumMergeViewModel from '@ViewModels/Album/AlbumMergeViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 
+const vocaDbContext = container.get(VocaDbContext);
+const albumRepo = container.get(AlbumRepository);
+
 const AlbumMerge = (model: { id: number }): void => {
 	$(function () {
-		const httpClient = new HttpClient();
-		var repo = new AlbumRepository(httpClient, vdb.values.baseAddress);
-		var vm = new AlbumMergeViewModel(repo, model.id);
+		var vm = new AlbumMergeViewModel(vocaDbContext, albumRepo, model.id);
 		ko.applyBindings(vm);
 
 		$('#mergeBtn').click(function () {

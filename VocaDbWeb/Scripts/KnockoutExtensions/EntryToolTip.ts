@@ -1,10 +1,13 @@
 import EntryRefContract from '@DataContracts/EntryRefContract';
 import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import functions from '@Shared/GlobalFunctions';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import $ from 'jquery';
 import ko, { Observable } from 'knockout';
 import _ from 'lodash';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 declare global {
 	interface KnockoutBindingHandlers {
@@ -106,7 +109,7 @@ ko.bindingHandlers.eventToolTip = {
 		element: HTMLElement,
 		valueAccessor: () => Observable<number>,
 	): void => {
-		const culture = vdb.values.uiCulture || undefined;
+		const culture = vocaDbContext.uiCulture || undefined;
 		initToolTip(element, '/Event/PopupContent', ko.unwrap(valueAccessor()), {
 			culture: culture,
 		});
@@ -135,8 +138,8 @@ ko.bindingHandlers.tagToolTip = {
 		element: HTMLElement,
 		valueAccessor: () => Observable<number>,
 	): void => {
-		var culture = vdb.values.uiCulture || undefined;
-		var lang = vdb.values.languagePreference;
+		var culture = vocaDbContext.uiCulture || undefined;
+		var lang = vocaDbContext.languagePreference;
 		initToolTip(element, '/Tag/PopupContent', ko.unwrap(valueAccessor()), {
 			culture: culture,
 			lang: ContentLanguagePreference[lang],
@@ -149,7 +152,7 @@ ko.bindingHandlers.userToolTip = {
 		element: HTMLElement,
 		valueAccessor: () => Observable<number>,
 	): void => {
-		var culture = vdb.values.uiCulture || undefined;
+		var culture = vocaDbContext.uiCulture || undefined;
 		initToolTip(element, '/User/PopupContent', ko.unwrap(valueAccessor()), {
 			culture: culture,
 		});

@@ -11,7 +11,7 @@ import ReleaseEventRepository from '@Repositories/ReleaseEventRepository';
 import UserRepository from '@Repositories/UserRepository';
 import EntryUrlMapper from '@Shared/EntryUrlMapper';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed, Observable, ObservableArray } from 'knockout';
 import _ from 'lodash';
 import moment from 'moment';
@@ -27,6 +27,7 @@ import WebLinksEditViewModel from '../WebLinksEditViewModel';
 
 export default class ReleaseEventEditViewModel {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private readonly repo: ReleaseEventRepository,
 		userRepository: UserRepository,
 		pvRepository: PVRepository,
@@ -103,7 +104,7 @@ export default class ReleaseEventEditViewModel {
 	public addArtist = (artistId?: number, customArtistName?: string): void => {
 		if (artistId) {
 			this.artistRepository
-				.getOne({ id: artistId, lang: vdb.values.languagePreference })
+				.getOne({ id: artistId, lang: this.vocaDbContext.languagePreference })
 				.then((artist) => {
 					const data: ArtistForEventContract = {
 						artist: artist,

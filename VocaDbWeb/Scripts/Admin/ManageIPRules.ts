@@ -1,7 +1,6 @@
 import AdminRepository from '@Repositories/AdminRepository';
-import HttpClient from '@Shared/HttpClient';
-import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import ManageIPRulesViewModel, {
 	IPRuleContract,
 } from '@ViewModels/Admin/ManageIPRulesViewModel';
@@ -9,17 +8,17 @@ import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
 
+const vocaDbContext = container.get(VocaDbContext);
+const adminRepo = container.get(AdminRepository);
+
 const AdminManageIPRules = (model: IPRuleContract[]): void => {
 	$(function () {
-		moment.locale(vdb.values.culture);
+		moment.locale(vocaDbContext.culture);
 		ko.punches.enableAll();
 
 		var rules = model;
-		const httpClient = new HttpClient();
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
-		var repo = new AdminRepository(httpClient, urlMapper);
 
-		var viewModel = new ManageIPRulesViewModel(rules, repo);
+		var viewModel = new ManageIPRulesViewModel(rules, adminRepo);
 		ko.applyBindings(viewModel);
 	});
 };

@@ -1,14 +1,28 @@
 import AlbumForEditContract from '@DataContracts/Album/AlbumForEditContract';
 import TranslatedEnumField from '@DataContracts/TranslatedEnumField';
-import RepositoryFactory from '@Repositories/RepositoryFactory';
+import AlbumRepository from '@Repositories/AlbumRepository';
+import ArtistRepository from '@Repositories/ArtistRepository';
+import PVRepository from '@Repositories/PVRepository';
+import ReleaseEventRepository from '@Repositories/ReleaseEventRepository';
+import SongRepository from '@Repositories/SongRepository';
+import UserRepository from '@Repositories/UserRepository';
 import DialogService from '@Shared/DialogService';
-import HttpClient from '@Shared/HttpClient';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import AlbumEditViewModel from '@ViewModels/Album/AlbumEditViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
+
+const vocaDbContext = container.get(VocaDbContext);
+const albumRepo = container.get(AlbumRepository);
+const songRepo = container.get(SongRepository);
+const artistRepo = container.get(ArtistRepository);
+const pvRepo = container.get(PVRepository);
+const userRepo = container.get(UserRepository);
+const eventRepo = container.get(ReleaseEventRepository);
 
 function initPage(): void {
 	$('#deleteLink').button({ icons: { primary: 'ui-icon-trash' } });
@@ -36,30 +50,23 @@ const AlbumEdit = (
 	webLinkCategoryJson: TranslatedEnumField[],
 ): void => {
 	$(function () {
-		moment.locale(vdb.values.culture);
+		moment.locale(vocaDbContext.culture);
 		ko.punches.enableAll();
 
 		vdb.resources.entryEdit = {
 			saveWarning: saveWarning,
 		};
 
-		const httpClient = new HttpClient();
-		var rootPath = vdb.values.baseAddress;
+		var rootPath = vocaDbContext.baseAddress;
 		var urlMapper = new UrlMapper(rootPath);
 
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var repo = repoFactory.albumRepository();
-		var songRepo = repoFactory.songRepository();
-		var artistRepo = repoFactory.artistRepository();
-		var pvRepo = repoFactory.pvRepository();
-		var userRepo = repoFactory.userRepository();
-		var eventRepo = repoFactory.eventRepository();
 		var editedModel = model.editedAlbum;
 		var viewModel;
 
 		if (editedModel) {
 			viewModel = new AlbumEditViewModel(
-				repo,
+				vocaDbContext,
+				albumRepo,
 				songRepo,
 				artistRepo,
 				pvRepo,
@@ -76,9 +83,10 @@ const AlbumEdit = (
 
 			ko.applyBindings(viewModel);
 		} else {
-			repo.getForEdit({ id: model.id }).then(function (model) {
+			albumRepo.getForEdit({ id: model.id }).then(function (model) {
 				viewModel = new AlbumEditViewModel(
-					repo,
+					vocaDbContext,
+					albumRepo,
 					songRepo,
 					artistRepo,
 					pvRepo,

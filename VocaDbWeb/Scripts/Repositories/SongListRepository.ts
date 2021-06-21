@@ -6,28 +6,31 @@ import SongListForEditContract from '@DataContracts/Song/SongListForEditContract
 import { SongOptionalFields } from '@Models/EntryOptionalFields';
 import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import HttpClient from '@Shared/HttpClient';
-import UrlMapper from '@Shared/UrlMapper';
 import AdvancedSearchFilter from '@ViewModels/Search/AdvancedSearchFilter';
+import { injectable } from 'inversify';
+import 'reflect-metadata';
 
+import { mergeUrls } from './BaseRepository';
 import EntryCommentRepository from './EntryCommentRepository';
+import RepositoryParams from './RepositoryParams';
 
+@injectable()
 export default class SongListRepository {
-	public constructor(
-		private readonly httpClient: HttpClient,
-		private readonly urlMapper: UrlMapper,
-	) {}
+	public constructor(private readonly httpClient: HttpClient) {}
 
 	public delete = ({
+		baseUrl,
 		id,
 		notes,
 		hardDelete,
-	}: {
+	}: RepositoryParams & {
 		id: number;
 		notes: string;
 		hardDelete: boolean;
 	}): Promise<void> => {
 		return this.httpClient.delete<void>(
-			this.urlMapper.mapRelative(
+			mergeUrls(
+				baseUrl,
 				`/api/songLists/${id}?hardDelete=${hardDelete}&notes=${encodeURIComponent(
 					notes,
 				)}`,
@@ -35,18 +38,20 @@ export default class SongListRepository {
 		);
 	};
 
-	// eslint-disable-next-line no-empty-pattern
-	public getComments = ({}: {}): EntryCommentRepository =>
-		new EntryCommentRepository(this.httpClient, this.urlMapper, '/songLists/');
+	public getComments = ({
+		baseUrl,
+	}: RepositoryParams & {}): EntryCommentRepository =>
+		new EntryCommentRepository(this.httpClient, '/songLists/');
 
 	public getFeatured = ({
+		baseUrl,
 		query,
 		category,
 		paging,
 		tagIds,
 		fields,
 		sort,
-	}: {
+	}: RepositoryParams & {
 		query: string;
 		category: string;
 		paging: PagingProperties;
@@ -54,7 +59,7 @@ export default class SongListRepository {
 		fields: string;
 		sort: string;
 	}): Promise<PartialFindResultContract<SongListContract>> => {
-		var url = this.urlMapper.mapRelative('/api/songLists/featured');
+		var url = mergeUrls(baseUrl, '/api/songLists/featured');
 		return this.httpClient.get<PartialFindResultContract<SongListContract>>(
 			url,
 			{
@@ -71,15 +76,15 @@ export default class SongListRepository {
 	};
 
 	public getForEdit = ({
+		baseUrl,
 		id,
-	}: {
-		id: number;
-	}): Promise<SongListForEditContract> => {
-		var url = this.urlMapper.mapRelative(`/api/songLists/${id}/for-edit`);
+	}: RepositoryParams & { id: number }): Promise<SongListForEditContract> => {
+		var url = mergeUrls(baseUrl, `/api/songLists/${id}/for-edit`);
 		return this.httpClient.get<SongListForEditContract>(url);
 	};
 
 	public getSongs = ({
+		baseUrl,
 		listId,
 		query,
 		songTypes,
@@ -94,7 +99,7 @@ export default class SongListRepository {
 		fields,
 		sort,
 		lang,
-	}: {
+	}: RepositoryParams & {
 		listId: number;
 		query: string;
 		songTypes?: string;
@@ -110,7 +115,7 @@ export default class SongListRepository {
 		sort: string;
 		lang: ContentLanguagePreference;
 	}): Promise<PartialFindResultContract<SongInListContract>> => {
-		var url = this.urlMapper.mapRelative(`/api/songLists/${listId}/songs`);
+		var url = mergeUrls(baseUrl, `/api/songLists/${listId}/songs`);
 		var data = {
 			query: query,
 			songTypes: songTypes,

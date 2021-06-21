@@ -1,9 +1,13 @@
 import ArtistContract from '@DataContracts/Artist/ArtistContract';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import SongCreateViewModel from '@ViewModels/SongCreateViewModel';
 
 import FakeArtistRepository from '../TestSupport/FakeArtistRepository';
 import FakeSongRepository from '../TestSupport/FakeSongRepository';
 import FakeTagRepository from '../TestSupport/FakeTagRepository';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 var repository = new FakeSongRepository();
 var artistRepository = new FakeArtistRepository();
@@ -24,7 +28,12 @@ repository.results = {
 };
 
 function createViewModel(): SongCreateViewModel {
-	return new SongCreateViewModel(repository, artistRepository, tagRepository);
+	return new SongCreateViewModel(
+		vocaDbContext,
+		repository,
+		artistRepository,
+		tagRepository,
+	);
 }
 
 test('constructor empty', () => {
@@ -39,6 +48,7 @@ test('constructor empty', () => {
 
 test('constructor with data', () => {
 	var target = new SongCreateViewModel(
+		vocaDbContext,
 		repository,
 		artistRepository,
 		tagRepository,

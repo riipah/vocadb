@@ -1,8 +1,14 @@
 import CommentContract from '@DataContracts/CommentContract';
-import RepositoryFactory from '@Repositories/RepositoryFactory';
+import AdminRepository from '@Repositories/AdminRepository';
+import ArtistRepository from '@Repositories/ArtistRepository';
+import ResourceRepository from '@Repositories/ResourceRepository';
+import SongRepository from '@Repositories/SongRepository';
+import TagRepository from '@Repositories/TagRepository';
+import UserRepository from '@Repositories/UserRepository';
 import HttpClient from '@Shared/HttpClient';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import PVPlayersFactory from '@ViewModels/PVs/PVPlayersFactory';
 import AlbumCollectionViewModel from '@ViewModels/User/AlbumCollectionViewModel';
 import FollowedArtistsViewModel from '@ViewModels/User/FollowedArtistsViewModel';
@@ -11,6 +17,14 @@ import UserDetailsViewModel from '@ViewModels/User/UserDetailsViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
+
+const vocaDbContext = container.get(VocaDbContext);
+const adminRepo = container.get(AdminRepository);
+const userRepo = container.get(UserRepository);
+const artistRepo = container.get(ArtistRepository);
+const resourceRepo = container.get(ResourceRepository);
+const songRepo = container.get(SongRepository);
+const tagRepo = container.get(TagRepository);
 
 function initPage(confirmDisableStr: string): void {
 	$('#mySettingsLink').button({ icons: { primary: 'ui-icon-wrench' } });
@@ -47,23 +61,12 @@ const UserDetails = (
 	ko.punches.enableAll();
 
 	$(function () {
-		var cultureCode = vdb.values.uiCulture;
+		moment.locale(vocaDbContext.culture);
 
-		moment.locale(vdb.values.culture);
-
-		var lang = vdb.values.languagePreference;
 		var userId = model.id;
-		var loggedUserId = vdb.values.loggedUserId;
 		const httpClient = new HttpClient();
-		var rootPath = vdb.values.baseAddress;
+		var rootPath = vocaDbContext.baseAddress;
 		var urlMapper = new UrlMapper(rootPath);
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var adminRepo = repoFactory.adminRepository();
-		var userRepo = repoFactory.userRepository();
-		var artistRepo = repoFactory.artistRepository();
-		var resourceRepo = repoFactory.resourceRepository();
-		var songRepo = repoFactory.songRepository();
-		var tagRepo = repoFactory.tagRepository();
 		var pvPlayersFactory = new PVPlayersFactory($('#pv-player-wrapper')[0]);
 		var latestComments = model.latestComments;
 
@@ -71,35 +74,32 @@ const UserDetails = (
 		var groupByRating = true;
 
 		var followedArtistsViewModel = new FollowedArtistsViewModel(
+			vocaDbContext,
 			userRepo,
 			resourceRepo,
 			tagRepo,
-			lang,
 			userId,
-			cultureCode,
 		);
 
 		var albumCollectionViewModel = new AlbumCollectionViewModel(
+			vocaDbContext,
 			userRepo,
 			artistRepo,
 			resourceRepo,
-			lang,
 			userId,
-			cultureCode,
 			publicCollection,
 			false,
 		);
 
 		var ratedSongsViewModel = new RatedSongsSearchViewModel(
+			vocaDbContext,
 			urlMapper,
 			userRepo,
 			artistRepo,
 			songRepo,
 			resourceRepo,
 			tagRepo,
-			lang,
 			userId,
-			cultureCode,
 			sort,
 			groupByRating,
 			pvPlayersFactory,
@@ -109,9 +109,8 @@ const UserDetails = (
 		);
 
 		var viewModel = new UserDetailsViewModel(
+			vocaDbContext,
 			userId,
-			cultureCode,
-			loggedUserId,
 			lastLoginAddress,
 			canDeleteComments,
 			httpClient,
@@ -120,7 +119,6 @@ const UserDetails = (
 			adminRepo,
 			resourceRepo,
 			tagRepo,
-			lang,
 			followedArtistsViewModel,
 			albumCollectionViewModel,
 			ratedSongsViewModel,

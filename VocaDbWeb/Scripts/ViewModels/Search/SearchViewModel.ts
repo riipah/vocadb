@@ -1,6 +1,5 @@
 import ResourcesContract from '@DataContracts/ResourcesContract';
 import TagBaseContract from '@DataContracts/Tag/TagBaseContract';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import ResourcesManager from '@Models/ResourcesManager';
 import Tag from '@Models/Tags/Tag';
 import AlbumRepository from '@Repositories/AlbumRepository';
@@ -12,7 +11,7 @@ import SongRepository from '@Repositories/SongRepository';
 import TagRepository from '@Repositories/TagRepository';
 import UserRepository from '@Repositories/UserRepository';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed, Observable } from 'knockout';
 
 import PVPlayersFactory from '../PVs/PVPlayersFactory';
@@ -36,6 +35,7 @@ class SearchType {
 
 export default class SearchViewModel {
 	public constructor(
+		vocaDbContext: VocaDbContext,
 		urlMapper: UrlMapper,
 		entryRepo: EntryRepository,
 		artistRepo: ArtistRepository,
@@ -46,9 +46,6 @@ export default class SearchViewModel {
 		resourceRepo: ResourceRepository,
 		userRepo: UserRepository,
 		unknownPictureUrl: string,
-		private lang: ContentLanguagePreference,
-		loggedUserId: number,
-		cultureCode: string,
 		searchType: string,
 		searchTerm: string,
 		tagIds: number[],
@@ -71,9 +68,9 @@ export default class SearchViewModel {
 		pageSize: number,
 		pvPlayersFactory: PVPlayersFactory,
 	) {
-		this.resourcesManager = new ResourcesManager(resourceRepo, cultureCode);
+		this.resourcesManager = new ResourcesManager(vocaDbContext, resourceRepo);
 		this.resources = this.resourcesManager.resources;
-		this.tagFilters = new TagFilters(tagRepo, lang);
+		this.tagFilters = new TagFilters(vocaDbContext, tagRepo);
 
 		if (searchTerm) this.searchTerm(searchTerm);
 
@@ -82,25 +79,23 @@ export default class SearchViewModel {
 
 		this.anythingSearchViewModel = new AnythingSearchViewModel(
 			this,
-			lang,
+			vocaDbContext,
 			entryRepo,
 		);
 		this.artistSearchViewModel = new ArtistSearchViewModel(
 			this,
-			lang,
+			vocaDbContext,
 			artistRepo,
-			loggedUserId,
 			artistType,
 		);
 
 		this.albumSearchViewModel = new AlbumSearchViewModel(
 			this,
+			vocaDbContext,
 			unknownPictureUrl,
-			lang,
 			albumRepo,
 			artistRepo,
 			resourceRepo,
-			cultureCode,
 			isAlbum ? sort : null!,
 			isAlbum ? artistId : null!,
 			isAlbum ? childVoicebanks : null!,
@@ -110,10 +105,9 @@ export default class SearchViewModel {
 
 		this.eventSearchViewModel = new EventSearchViewModel(
 			this,
-			lang,
+			vocaDbContext,
 			eventRepo,
 			artistRepo,
-			loggedUserId,
 			sort,
 			artistId,
 			eventCategory,
@@ -121,15 +115,13 @@ export default class SearchViewModel {
 
 		this.songSearchViewModel = new SongSearchViewModel(
 			this,
+			vocaDbContext,
 			urlMapper,
-			lang,
 			songRepo,
 			artistRepo,
 			userRepo,
 			eventRepo,
 			resourceRepo,
-			cultureCode,
-			loggedUserId,
 			isSong ? sort : null!,
 			isSong ? artistId : null!,
 			isSong ? childVoicebanks : null!,
@@ -145,7 +137,11 @@ export default class SearchViewModel {
 			pvPlayersFactory,
 		);
 
-		this.tagSearchViewModel = new TagSearchViewModel(this, lang, tagRepo);
+		this.tagSearchViewModel = new TagSearchViewModel(
+			this,
+			vocaDbContext,
+			tagRepo,
+		);
 
 		if (
 			tagIds != null ||
@@ -195,7 +191,7 @@ export default class SearchViewModel {
 
 		resourceRepo
 			.getList({
-				cultureCode: vdb.values.uiCulture,
+				cultureCode: vocaDbContext.uiCulture,
 				setNames: [
 					'albumSortRuleNames',
 					'artistSortRuleNames',
@@ -215,7 +211,7 @@ export default class SearchViewModel {
 
 		tagRepo
 			.getTopTags({
-				lang: vdb.values.languagePreference,
+				lang: vocaDbContext.languagePreference,
 				categoryName: Tag.commonCategory_Genres,
 				entryType: undefined,
 			})

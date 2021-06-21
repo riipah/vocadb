@@ -9,7 +9,6 @@ export default class VenueDetailsViewModel {
 	public constructor(
 		repo: VenueRepository,
 		reportTypes: IEntryReportType[],
-		public loggedUserId: number,
 		venueId: number,
 	) {
 		this.reportViewModel = new ReportEntryViewModel(

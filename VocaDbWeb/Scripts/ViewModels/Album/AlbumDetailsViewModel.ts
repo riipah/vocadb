@@ -6,13 +6,13 @@ import AlbumForUserForApiContract from '@DataContracts/User/AlbumForUserForApiCo
 import UserApiContract from '@DataContracts/User/UserApiContract';
 import ArtistHelper from '@Helpers/ArtistHelper';
 import EntryType from '@Models/EntryType';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import AlbumRepository from '@Repositories/AlbumRepository';
 import ArtistRepository from '@Repositories/ArtistRepository';
 import UserRepository from '@Repositories/UserRepository';
 import functions from '@Shared/GlobalFunctions';
 import ui from '@Shared/MessagesTyped';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import $ from 'jquery';
 import ko, { Observable } from 'knockout';
 import _ from 'lodash';
@@ -60,13 +60,12 @@ export default class AlbumDetailsViewModel {
 	};
 
 	public constructor(
+		vocaDbContext: VocaDbContext,
 		repo: AlbumRepository,
 		userRepo: UserRepository,
 		artistRepository: ArtistRepository,
 		data: AlbumDetailsAjax,
 		reportTypes: IEntryReportType[],
-		loggedUserId: number,
-		lang: ContentLanguagePreference,
 		canDeleteAllComments: boolean,
 		formatString: string,
 		showTranslatedDescription: boolean,
@@ -77,9 +76,9 @@ export default class AlbumDetailsViewModel {
 			showTranslatedDescription,
 		);
 		this.comments = new EditableCommentsViewModel(
+			vocaDbContext,
 			repo,
 			this.id,
-			loggedUserId,
 			canDeleteAllComments,
 			canDeleteAllComments,
 			false,
@@ -88,6 +87,7 @@ export default class AlbumDetailsViewModel {
 		);
 
 		this.personalDescription = new SelfDescriptionViewModel(
+			vocaDbContext,
 			data.personalDescriptionAuthor!,
 			data.personalDescriptionText!,
 			artistRepository,
@@ -96,7 +96,7 @@ export default class AlbumDetailsViewModel {
 					.getOneWithComponents({
 						id: this.id,
 						fields: 'Artists',
-						lang: vdb.values.languagePreference,
+						lang: vocaDbContext.languagePreference,
 					})
 					.then((result) => {
 						var artists = _.chain(result.artists!)
@@ -144,11 +144,11 @@ export default class AlbumDetailsViewModel {
 		);
 
 		this.reviewsViewModel = new AlbumReviewsViewModel(
+			vocaDbContext,
 			repo,
 			this.id,
 			canDeleteAllComments,
 			canDeleteAllComments,
-			loggedUserId,
 		);
 	}
 }
@@ -191,11 +191,11 @@ export class DownloadTagsViewModel {
 
 export class AlbumReviewsViewModel {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private readonly albumRepository: AlbumRepository,
 		private readonly albumId: number,
 		private readonly canDeleteAllComments: boolean,
 		private readonly canEditAllComments: boolean,
-		private readonly loggedUserId?: number,
 	) {}
 
 	public beginEditReview = (review: AlbumReviewViewModel): void => {
@@ -212,14 +212,14 @@ export class AlbumReviewsViewModel {
 		return (
 			this.canDeleteAllComments ||
 			this.canEditAllComments ||
-			(comment.user && comment.user.id === this.loggedUserId)
+			(comment.user && comment.user.id === this.vocaDbContext.loggedUserId)
 		);
 	};
 
 	private canEditReview = (comment: AlbumReviewContract): boolean => {
 		return (
 			this.canEditAllComments ||
-			(comment.user && comment.user.id === this.loggedUserId)
+			(comment.user && comment.user.id === this.vocaDbContext.loggedUserId)
 		);
 	};
 
@@ -229,7 +229,7 @@ export class AlbumReviewsViewModel {
 			languageCode: this.languageCode(),
 			text: this.newReviewText(),
 			title: this.newReviewTitle(),
-			user: { id: this.loggedUserId! },
+			user: { id: this.vocaDbContext.loggedUserId! },
 		};
 		this.newReviewText('');
 		this.newReviewTitle('');
@@ -325,7 +325,7 @@ export class AlbumReviewsViewModel {
 		return _.some(
 			this.reviews(),
 			(review) =>
-				review.user.id === this.loggedUserId &&
+				review.user.id === this.vocaDbContext.loggedUserId &&
 				review.languageCode() === this.languageCode(),
 		);
 	});

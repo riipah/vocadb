@@ -1,16 +1,14 @@
 import TagRepository from '@Repositories/TagRepository';
-import HttpClient from '@Shared/HttpClient';
-import vdb from '@Shared/VdbStatic';
+import { container } from '@Shared/inversify.config';
 import ManageEntryTagMappingsViewModel from '@ViewModels/Admin/ManageEntryTagMappingsViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 
+const tagRepo = container.get(TagRepository);
+
 const AdminManageEntryTagMappings = (): void => {
 	$(function () {
 		ko.punches.enableAll();
-
-		const httpClient = new HttpClient();
-		var tagRepo = new TagRepository(httpClient, vdb.values.baseAddress);
 
 		var viewModel = new ManageEntryTagMappingsViewModel(tagRepo);
 		ko.applyBindings(viewModel);

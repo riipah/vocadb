@@ -1,4 +1,4 @@
-import vdb from '@Shared/VdbStatic';
+import { mergeUrls } from '@Repositories/BaseRepository';
 import $ from 'jquery';
 
 export default class functions {
@@ -16,21 +16,13 @@ export default class functions {
 	}
 
 	public static mapAbsoluteUrl(relative: string): string {
-		return functions.mergeUrls(vdb.values.baseAddress, relative);
+		return functions.mergeUrls(undefined /* HACK */, relative);
 	}
 
-	public static mergeUrls(base: string, relative: string): string {
-		if (base.charAt(base.length - 1) === '/' && relative.charAt(0) === '/')
-			return base + relative.substr(1);
-
-		if (base.charAt(base.length - 1) === '/' && relative.charAt(0) !== '/')
-			return base + relative;
-
-		if (base.charAt(base.length - 1) !== '/' && relative.charAt(0) === '/')
-			return base + relative;
-
-		return base + '/' + relative;
-	}
+	public static mergeUrls = (
+		base: string | undefined,
+		relative: string,
+	): string => mergeUrls(base, relative);
 
 	public static getUrlDomain(url: string): string {
 		// http://stackoverflow.com/a/8498629

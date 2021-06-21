@@ -2,9 +2,13 @@ import PartialFindResultContract from '@DataContracts/PartialFindResultContract'
 import UserApiContract from '@DataContracts/User/UserApiContract';
 import UserMessageSummaryContract from '@DataContracts/User/UserMessageSummaryContract';
 import { UserInboxType } from '@Repositories/UserRepository';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import UserMessagesViewModel from '@ViewModels/User/UserMessagesViewModel';
 
 import FakeUserRepository from '../../TestSupport/FakeUserRepository';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 var receiver: UserApiContract;
 var data: PartialFindResultContract<UserMessageSummaryContract>;
@@ -29,7 +33,11 @@ var createMessage = (
 };
 
 var createViewModel = (): UserMessagesViewModel => {
-	return new UserMessagesViewModel(repository, null!, UserInboxType.Received);
+	return new UserMessagesViewModel(
+		vocaDbContext,
+		repository,
+		UserInboxType.Received,
+	);
 };
 
 beforeEach(() => {

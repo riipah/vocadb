@@ -1,17 +1,18 @@
 import SongContract from '@DataContracts/Song/SongContract';
 import SongRepository from '@Repositories/SongRepository';
-import HttpClient from '@Shared/HttpClient';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import SongMergeViewModel from '@ViewModels/Song/SongMergeViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 
+const vocaDbContext = container.get(VocaDbContext);
+const songRepo = container.get(SongRepository);
+
 const SongMerge = (model: SongContract): void => {
 	$(function () {
-		const httpClient = new HttpClient();
-		var repo = new SongRepository(httpClient, vdb.values.baseAddress);
 		var data = model;
-		var vm = new SongMergeViewModel(repo, data);
+		var vm = new SongMergeViewModel(vocaDbContext, songRepo, data);
 		ko.applyBindings(vm);
 
 		$('#mergeBtn').click(function () {

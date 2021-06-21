@@ -3,7 +3,6 @@ import SongApiContract from '@DataContracts/Song/SongApiContract';
 import SongListBaseContract from '@DataContracts/SongListBaseContract';
 import TagBaseContract from '@DataContracts/Tag/TagBaseContract';
 import RatedSongForUserForApiContract from '@DataContracts/User/RatedSongForUserForApiContract';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import PVServiceIcons from '@Models/PVServiceIcons';
 import ArtistRepository from '@Repositories/ArtistRepository';
 import ResourceRepository from '@Repositories/ResourceRepository';
@@ -12,7 +11,7 @@ import TagRepository from '@Repositories/TagRepository';
 import UserRepository from '@Repositories/UserRepository';
 import ui from '@Shared/MessagesTyped';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko from 'knockout';
 import _ from 'lodash';
 import moment from 'moment';
@@ -30,15 +29,14 @@ import SongWithPreviewViewModel from '../Song/SongWithPreviewViewModel';
 
 export default class RatedSongsSearchViewModel {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		urlMapper: UrlMapper,
 		private userRepo: UserRepository,
 		private artistRepo: ArtistRepository,
 		private songRepo: SongRepository,
 		private resourceRepo: ResourceRepository,
 		tagRepo: TagRepository,
-		private lang: ContentLanguagePreference,
 		private loggedUserId: number,
-		private cultureCode: string,
 		sort: string,
 		groupByRating: boolean,
 		pvPlayersFactory: PVPlayersFactory,
@@ -46,7 +44,11 @@ export default class RatedSongsSearchViewModel {
 		artistId?: number,
 		childVoicebanks?: boolean,
 	) {
-		this.artistFilters = new ArtistFilters(artistRepo, childVoicebanks);
+		this.artistFilters = new ArtistFilters(
+			vocaDbContext,
+			artistRepo,
+			childVoicebanks,
+		);
 
 		if (artistId) this.artistFilters.selectArtist(artistId);
 
@@ -56,7 +58,7 @@ export default class RatedSongsSearchViewModel {
 
 		if (groupByRating != null) this.groupByRating(groupByRating);
 
-		this.tagFilters = new TagFilters(tagRepo, lang);
+		this.tagFilters = new TagFilters(vocaDbContext, tagRepo);
 
 		this.advancedFilters.filters.subscribe(this.updateResultsWithTotalCount);
 		this.artistFilters.filters.subscribe(this.updateResultsWithTotalCount);
@@ -72,6 +74,7 @@ export default class RatedSongsSearchViewModel {
 		this.viewMode.subscribe(this.updateResultsWithTotalCount);
 
 		this.pvPlayerViewModel = new PVPlayerViewModel(
+			vocaDbContext,
 			urlMapper,
 			songRepo,
 			userRepo,
@@ -92,12 +95,12 @@ export default class RatedSongsSearchViewModel {
 			ko.observable('AdditionalNames,ThumbUrl'),
 		);
 		this.playListViewModel = new PlayListViewModel(
+			vocaDbContext,
 			urlMapper,
 			songsRepoAdapter,
 			songRepo,
 			userRepo,
 			this.pvPlayerViewModel,
-			lang,
 		);
 
 		if (initialize) this.init();
@@ -167,7 +170,7 @@ export default class RatedSongsSearchViewModel {
 
 		this.resourceRepo
 			.getList({
-				cultureCode: vdb.values.uiCulture,
+				cultureCode: this.vocaDbContext.uiCulture,
 				setNames: [
 					'songSortRuleNames',
 					'user_ratedSongForUserSortRuleNames',
@@ -207,7 +210,7 @@ export default class RatedSongsSearchViewModel {
 			.getRatedSongsList({
 				userId: this.loggedUserId,
 				paging: pagingProperties,
-				lang: vdb.values.languagePreference,
+				lang: this.vocaDbContext.languagePreference,
 				query: this.searchTerm(),
 				tagIds: this.tagFilters.tagIds(),
 				artistIds: this.artistFilters.artistIds(),

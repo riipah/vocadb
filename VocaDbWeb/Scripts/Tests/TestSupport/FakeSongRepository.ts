@@ -2,6 +2,7 @@ import NewSongCheckResultContract from '@DataContracts/NewSongCheckResultContrac
 import SongApiContract from '@DataContracts/Song/SongApiContract';
 import SongListBaseContract from '@DataContracts/SongListBaseContract';
 import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
+import RepositoryParams from '@Repositories/RepositoryParams';
 import SongRepository from '@Repositories/SongRepository';
 import HttpClient from '@Shared/HttpClient';
 import _ from 'lodash';
@@ -21,14 +22,15 @@ export default class FakeSongRepository extends SongRepository {
 	public songsInLists: SongInList[] = [];
 
 	public constructor() {
-		super(new HttpClient(), '');
+		super(new HttpClient());
 
 		this.addSongToList = ({
+			baseUrl,
 			listId,
 			songId,
 			notes,
 			newListName,
-		}: {
+		}: RepositoryParams & {
 			listId: number;
 			songId: number;
 			notes: string;
@@ -55,8 +57,9 @@ export default class FakeSongRepository extends SongRepository {
 		};
 
 		this.findDuplicate = ({
+			baseUrl,
 			params,
-		}: {
+		}: RepositoryParams & {
 			params: {
 				term: string[];
 				pv: string[];
@@ -68,10 +71,11 @@ export default class FakeSongRepository extends SongRepository {
 		};
 
 		this.getOneWithComponents = ({
+			baseUrl,
 			id,
 			fields,
 			lang,
-		}: {
+		}: RepositoryParams & {
 			id: number;
 			fields: string;
 			lang: ContentLanguagePreference;
@@ -80,16 +84,18 @@ export default class FakeSongRepository extends SongRepository {
 		};
 
 		this.songListsForSong = ({
+			baseUrl,
 			songId,
-		}: {
+		}: RepositoryParams & {
 			songId: number;
 		}): Promise<string> => {
 			return FakePromise.resolve('Miku!');
 		};
 
 		this.songListsForUser = ({
+			baseUrl,
 			ignoreSongId,
-		}: {
+		}: RepositoryParams & {
 			ignoreSongId: number;
 		}): Promise<SongListBaseContract[]> => {
 			return FakePromise.resolve(this.songLists);

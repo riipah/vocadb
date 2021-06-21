@@ -1,6 +1,7 @@
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import SongVoteRating from '@Models/SongVoteRating';
 import HttpClient from '@Shared/HttpClient';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import { SongDetailsAjax } from '@ViewModels/Song/SongDetailsViewModel';
 import { SongDetailsResources } from '@ViewModels/Song/SongDetailsViewModel';
 import SongDetailsViewModel from '@ViewModels/Song/SongDetailsViewModel';
@@ -9,6 +10,8 @@ import _ from 'lodash';
 
 import FakeSongRepository from '../../TestSupport/FakeSongRepository';
 import FakeUserRepository from '../../TestSupport/FakeUserRepository';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 var rep: FakeSongRepository;
 var userRep = new FakeUserRepository();
@@ -34,6 +37,7 @@ beforeEach(() => {
 		{ id: 3, name: 'Mikupa 2013', featuredCategory: 'Concerts' },
 	];
 	target = new SongDetailsViewModel(
+		vocaDbContext,
 		new HttpClient(),
 		rep,
 		userRep,
@@ -42,8 +46,6 @@ beforeEach(() => {
 		false,
 		data,
 		[],
-		0,
-		ContentLanguagePreference.Default,
 		false,
 		null!,
 	);

@@ -11,6 +11,7 @@ import UserRepository from '@Repositories/UserRepository';
 import { IDialogService } from '@Shared/DialogService';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import $ from 'jquery';
 import ko, { Computed, Observable, ObservableArray } from 'knockout';
 import _ from 'lodash';
@@ -40,7 +41,7 @@ export default class ArtistEditViewModel {
 	private addGroup = (artistId?: number): void => {
 		if (artistId) {
 			this.artistRepo
-				.getOne({ id: artistId, lang: vdb.values.languagePreference })
+				.getOne({ id: artistId, lang: this.vocaDbContext.languagePreference })
 				.then((artist: ArtistContract) => {
 					this.groups.push({ id: 0, parent: artist });
 				});
@@ -179,6 +180,7 @@ export default class ArtistEditViewModel {
 	}
 
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private artistRepo: ArtistRepository,
 		userRepository: UserRepository,
 		private urlMapper: UrlMapper,
@@ -200,7 +202,7 @@ export default class ArtistEditViewModel {
 			data.baseVoicebank,
 			(entryId, callback) =>
 				artistRepo
-					.getOne({ id: entryId, lang: vdb.values.languagePreference })
+					.getOne({ id: entryId, lang: vocaDbContext.languagePreference })
 					.then(callback),
 		);
 		this.description = new EnglishTranslatedStringEditViewModel(
@@ -213,7 +215,7 @@ export default class ArtistEditViewModel {
 			data.illustrator,
 			(entryId, callback) =>
 				artistRepo
-					.getOne({ id: entryId, lang: vdb.values.languagePreference })
+					.getOne({ id: entryId, lang: vocaDbContext.languagePreference })
 					.then(callback),
 		);
 		this.names = NamesEditViewModel.fromContracts(data.names);
@@ -221,7 +223,7 @@ export default class ArtistEditViewModel {
 			null!,
 			(entryId, callback) =>
 				artistRepo
-					.getOne({ id: entryId, lang: vdb.values.languagePreference })
+					.getOne({ id: entryId, lang: vocaDbContext.languagePreference })
 					.then(callback),
 		);
 		this.pictures = new EntryPictureFileListEditViewModel(data.pictures);
@@ -233,7 +235,7 @@ export default class ArtistEditViewModel {
 			data.voiceProvider,
 			(entryId, callback) =>
 				artistRepo
-					.getOne({ id: entryId, lang: vdb.values.languagePreference })
+					.getOne({ id: entryId, lang: vocaDbContext.languagePreference })
 					.then(callback),
 		);
 		this.webLinks = new WebLinksEditViewModel(data.webLinks, webLinkCategories);

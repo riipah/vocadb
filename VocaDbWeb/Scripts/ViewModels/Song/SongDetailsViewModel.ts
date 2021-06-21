@@ -8,7 +8,6 @@ import RatedSongForUserForApiContract from '@DataContracts/User/RatedSongForUser
 import UserApiContract from '@DataContracts/User/UserApiContract';
 import ArtistHelper from '@Helpers/ArtistHelper';
 import EntryType from '@Models/EntryType';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import SongVoteRating from '@Models/SongVoteRating';
 import SongType from '@Models/Songs/SongType';
 import ArtistRepository from '@Repositories/ArtistRepository';
@@ -17,6 +16,7 @@ import UserRepository from '@Repositories/UserRepository';
 import HttpClient from '@Shared/HttpClient';
 import ui from '@Shared/MessagesTyped';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed, Observable } from 'knockout';
 import _ from 'lodash';
 
@@ -125,13 +125,13 @@ export default class SongDetailsViewModel {
 
 		const { siteUrl, id } = match;
 
-		const repo = new SongRepository(this.httpClient, siteUrl);
 		// TODO: this should be cached, but first we need to make sure the other instances are not cached.
-		repo
+		this.repository
 			.getOneWithComponents({
+				baseUrl: siteUrl,
 				id: id,
 				fields: 'None',
-				lang: vdb.values.languagePreference,
+				lang: this.vocaDbContext.languagePreference,
 			})
 			.then((song) => {
 				if (song.songType === SongType[SongType.Original])
@@ -180,6 +180,7 @@ export default class SongDetailsViewModel {
 	public userRating: PVRatingButtonsViewModel;
 
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private readonly httpClient: HttpClient,
 		private repository: SongRepository,
 		userRepository: UserRepository,
@@ -188,8 +189,6 @@ export default class SongDetailsViewModel {
 		showTranslatedDescription: boolean,
 		data: SongDetailsAjax,
 		reportTypes: IEntryReportType[],
-		loggedUserId: number,
-		private lang: ContentLanguagePreference,
 		canDeleteAllComments: boolean,
 		ratingCallback: () => void,
 	) {
@@ -203,9 +202,9 @@ export default class SongDetailsViewModel {
 		this.allVersionsVisible = ko.observable(false);
 
 		this.comments = new EditableCommentsViewModel(
+			vocaDbContext,
 			repository,
 			this.id,
-			loggedUserId,
 			canDeleteAllComments,
 			canDeleteAllComments,
 			false,
@@ -237,6 +236,7 @@ export default class SongDetailsViewModel {
 		);
 
 		this.personalDescription = new SelfDescriptionViewModel(
+			vocaDbContext,
 			data.personalDescriptionAuthor!,
 			data.personalDescriptionText!,
 			artistRepository,
@@ -245,7 +245,7 @@ export default class SongDetailsViewModel {
 					.getOneWithComponents({
 						id: this.id,
 						fields: 'Artists',
-						lang: vdb.values.languagePreference,
+						lang: vocaDbContext.languagePreference,
 					})
 					.then((result) => {
 						var artists = _.chain(result.artists!)

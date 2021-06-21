@@ -18,6 +18,7 @@ import UserRepository from '@Repositories/UserRepository';
 import { IDialogService } from '@Shared/DialogService';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import $ from 'jquery';
 import ko, { Computed, Observable, ObservableArray } from 'knockout';
 import _ from 'lodash';
@@ -81,7 +82,7 @@ export default class SongEditViewModel {
 	public addArtist = (artistId?: number, customArtistName?: string): void => {
 		if (artistId) {
 			this.artistRepository
-				.getOne({ id: artistId, lang: vdb.values.languagePreference })
+				.getOne({ id: artistId, lang: this.vocaDbContext.languagePreference })
 				.then((artist) => {
 					var data: ArtistForAlbumContract = {
 						artist: artist,
@@ -154,12 +155,12 @@ export default class SongEditViewModel {
 			this.songRepository.getByNames({
 				names: names,
 				ignoreIds: [this.id],
-				lang: vdb.values.languagePreference,
+				lang: this.vocaDbContext.languagePreference,
 			}),
 			this.songRepository.getByNames({
 				names: names,
 				ignoreIds: [this.id],
-				lang: vdb.values.languagePreference,
+				lang: this.vocaDbContext.languagePreference,
 				songTypes: [SongType.Original, SongType.Remaster],
 			}),
 		]);
@@ -243,6 +244,7 @@ export default class SongEditViewModel {
 	public validationError_unspecifiedNames: Computed<boolean>;
 
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private songRepository: SongRepository,
 		private artistRepository: ArtistRepository,
 		pvRepository: PVRepository,
@@ -277,7 +279,7 @@ export default class SongEditViewModel {
 			data.originalVersion,
 			(entryId, callback) =>
 				songRepository
-					.getOne({ id: entryId, lang: vdb.values.languagePreference })
+					.getOne({ id: entryId, lang: vocaDbContext.languagePreference })
 					.then(callback),
 		);
 		this.publishDate = ko.observable(

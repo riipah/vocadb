@@ -10,6 +10,7 @@ import HttpClient from '@Shared/HttpClient';
 import ui from '@Shared/MessagesTyped';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { ObservableArray } from 'knockout';
 import _ from 'lodash';
 
@@ -21,13 +22,13 @@ import TagsEditViewModel from '../Tag/TagsEditViewModel';
 
 export default class ReleaseEventDetailsViewModel {
 	public constructor(
+		public readonly vocaDbContext: VocaDbContext,
 		httpClient: HttpClient,
 		urlMapper: UrlMapper,
 		private readonly repo: ReleaseEventRepository,
 		private readonly userRepo: UserRepository,
 		latestComments: CommentContract[],
 		reportTypes: IEntryReportType[],
-		public loggedUserId: number,
 		private readonly eventId: number,
 		eventAssociationType: UserEventRelationshipType,
 		usersAttending: UserBaseContract[],
@@ -36,13 +37,12 @@ export default class ReleaseEventDetailsViewModel {
 	) {
 		const commentRepo = new CommentRepository(
 			httpClient,
-			urlMapper,
 			EntryType.ReleaseEvent,
 		);
 		this.comments = new EditableCommentsViewModel(
+			vocaDbContext,
 			commentRepo,
 			eventId,
-			loggedUserId,
 			canDeleteAllComments,
 			canDeleteAllComments,
 			false,
@@ -105,7 +105,7 @@ export default class ReleaseEventDetailsViewModel {
 		this.eventAssociationType(null!);
 		var link = _.find(
 			this.usersAttending(),
-			(u) => u.id === this.loggedUserId,
+			(u) => u.id === this.vocaDbContext.loggedUserId,
 		)!;
 		this.usersAttending.remove(link);
 	};
@@ -119,7 +119,7 @@ export default class ReleaseEventDetailsViewModel {
 		});
 		this.eventAssociationType(UserEventRelationshipType.Attending);
 		this.userRepo
-			.getOne({ id: vdb.values.loggedUserId, fields: 'MainPicture' })
+			.getOne({ id: this.vocaDbContext.loggedUserId, fields: 'MainPicture' })
 			.then((user) => {
 				this.usersAttending.push(user);
 			});
@@ -133,7 +133,7 @@ export default class ReleaseEventDetailsViewModel {
 		this.eventAssociationType(UserEventRelationshipType.Interested);
 		var link = _.find(
 			this.usersAttending(),
-			(u) => u.id === this.loggedUserId,
+			(u) => u.id === this.vocaDbContext.loggedUserId,
 		)!;
 		this.usersAttending.remove(link);
 	};

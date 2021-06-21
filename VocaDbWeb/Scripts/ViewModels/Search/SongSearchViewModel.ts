@@ -1,6 +1,5 @@
 import SongApiContract from '@DataContracts/Song/SongApiContract';
 import KnockoutHelper from '@Helpers/KnockoutHelper';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import IEntryWithIdAndName from '@Models/IEntryWithIdAndName';
 import PVServiceIcons from '@Models/PVServiceIcons';
 import ResourcesManager from '@Models/ResourcesManager';
@@ -12,7 +11,7 @@ import SongRepository from '@Repositories/SongRepository';
 import UserRepository from '@Repositories/UserRepository';
 import ui from '@Shared/MessagesTyped';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed, Observable } from 'knockout';
 import _ from 'lodash';
 import moment from 'moment';
@@ -30,15 +29,13 @@ import SearchViewModel from './SearchViewModel';
 export default class SongSearchViewModel extends SearchCategoryBaseViewModel<ISongSearchItem> {
 	public constructor(
 		searchViewModel: SearchViewModel,
+		public readonly vocaDbContext: VocaDbContext,
 		urlMapper: UrlMapper,
-		lang: ContentLanguagePreference,
 		private songRepo: SongRepository,
 		private artistRepo: ArtistRepository,
 		private userRepo: UserRepository,
 		private eventRepo: ReleaseEventRepository,
 		resourceRep: ResourceRepository,
-		cultureCode: string,
-		private loggedUserId: number,
 		sort: string,
 		artistId: number[],
 		childVoicebanks: boolean,
@@ -59,14 +56,18 @@ export default class SongSearchViewModel extends SearchCategoryBaseViewModel<ISo
 			this.resourceManager = searchViewModel.resourcesManager;
 			this.showTags = this.searchViewModel.showTags;
 		} else {
-			this.resourceManager = new ResourcesManager(resourceRep, cultureCode);
+			this.resourceManager = new ResourcesManager(vocaDbContext, resourceRep);
 			this.resourceManager.loadResources(null!, 'songSortRuleNames');
 			this.showTags = ko.observable(false);
 		}
 
 		this.pvServiceIcons = new PVServiceIcons(urlMapper);
 
-		this.artistFilters = new ArtistFilters(this.artistRepo, childVoicebanks);
+		this.artistFilters = new ArtistFilters(
+			vocaDbContext,
+			this.artistRepo,
+			childVoicebanks,
+		);
 		this.artistFilters.selectArtists(artistId);
 
 		this.releaseEvent = new BasicEntryLinkViewModel<IEntryWithIdAndName>(
@@ -97,7 +98,7 @@ export default class SongSearchViewModel extends SearchCategoryBaseViewModel<ISo
 			null!,
 			(entryId, callback) =>
 				this.songRepo
-					.getOne({ id: entryId, lang: vdb.values.languagePreference })
+					.getOne({ id: entryId, lang: vocaDbContext.languagePreference })
 					.then(callback),
 		);
 
@@ -123,6 +124,7 @@ export default class SongSearchViewModel extends SearchCategoryBaseViewModel<ISo
 		this.onlyRatedSongs.subscribe(this.updateResultsWithTotalCount);
 		this.parentVersion.subscribe(this.updateResultsWithTotalCount);
 		this.pvPlayerViewModel = new PVPlayerViewModel(
+			vocaDbContext,
 			urlMapper,
 			songRepo,
 			userRepo,
@@ -166,7 +168,7 @@ export default class SongSearchViewModel extends SearchCategoryBaseViewModel<ISo
 			this.since,
 			this.minScore,
 			this.onlyRatedSongs,
-			this.loggedUserId,
+			vocaDbContext.loggedUserId,
 			this.parentVersion.id,
 			this.fields,
 			this.draftsOnly,
@@ -174,12 +176,12 @@ export default class SongSearchViewModel extends SearchCategoryBaseViewModel<ISo
 		);
 
 		this.playListViewModel = new PlayListViewModel(
+			vocaDbContext,
 			urlMapper,
 			songsRepoAdapter,
 			songRepo,
 			userRepo,
 			this.pvPlayerViewModel,
-			lang,
 		);
 
 		this.loadResults = (
@@ -197,7 +199,7 @@ export default class SongSearchViewModel extends SearchCategoryBaseViewModel<ISo
 				this.songRepo
 					.getList({
 						paging: pagingProperties,
-						lang: vdb.values.languagePreference,
+						lang: vocaDbContext.languagePreference,
 						query: searchTerm,
 						sort: this.sort(),
 						songTypes:
@@ -219,7 +221,7 @@ export default class SongSearchViewModel extends SearchCategoryBaseViewModel<ISo
 						since: this.since(),
 						minScore: this.minScore(),
 						userCollectionId: this.onlyRatedSongs()
-							? vdb.values.loggedUserId
+							? vocaDbContext.loggedUserId
 							: undefined,
 						parentSongId: this.parentVersion.id(),
 						fields: this.fields(),

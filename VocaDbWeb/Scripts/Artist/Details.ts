@@ -1,16 +1,27 @@
 import CommentContract from '@DataContracts/CommentContract';
 import TagUsageForApiContract from '@DataContracts/Tag/TagUsageForApiContract';
-import RepositoryFactory from '@Repositories/RepositoryFactory';
+import AlbumRepository from '@Repositories/AlbumRepository';
+import ArtistRepository from '@Repositories/ArtistRepository';
+import ResourceRepository from '@Repositories/ResourceRepository';
 import SongRepository from '@Repositories/SongRepository';
-import HttpClient from '@Shared/HttpClient';
+import UserRepository from '@Repositories/UserRepository';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import ArtistDetailsViewModel from '@ViewModels/Artist/ArtistDetailsViewModel';
 import PVPlayersFactory from '@ViewModels/PVs/PVPlayersFactory';
 import { IEntryReportType } from '@ViewModels/ReportEntryViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
+
+const vocaDbContext = container.get(VocaDbContext);
+const artistRepo = container.get(ArtistRepository);
+const albumRepo = container.get(AlbumRepository);
+const songRepo = container.get(SongRepository);
+const resourceRepo = container.get(ResourceRepository);
+const userRepo = container.get(UserRepository);
 
 function initPage(
 	artistId: number,
@@ -88,27 +99,19 @@ const ArtistDetails = (
 	saveStr: string,
 ): void => {
 	$(function () {
-		moment.locale(vdb.values.culture);
+		moment.locale(vocaDbContext.culture);
 
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
+		var urlMapper = new UrlMapper(vocaDbContext.baseAddress);
 
-		var cultureCode = vdb.values.uiCulture;
-		var loggedUserId = vdb.values.loggedUserId;
 		var unknownPictureUrl = urlMapper.mapRelative('/Content/unknown.png');
 
-		const httpClient = new HttpClient();
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var artistRepo = repoFactory.artistRepository();
-		var albumRepository = repoFactory.albumRepository();
-		var songRepo = repoFactory.songRepository();
-		var resourceRepo = repoFactory.resourceRepository();
-		var userRepository = repoFactory.userRepository();
 		var pvPlayerElem = $('#pv-player-wrapper')[0];
 		var pvPlayersFactory = new PVPlayersFactory(pvPlayerElem);
 		var tagUsages = model.tags;
 		var latestComments = model.latestComments;
 
 		var viewModel = new ArtistDetailsViewModel(
+			vocaDbContext,
 			artistRepo,
 			model.id,
 			tagUsages,
@@ -117,15 +120,12 @@ const ArtistDetails = (
 			model.siteNotifications,
 			hasEnglishDescription,
 			unknownPictureUrl,
-			vdb.values.languagePreference,
 			urlMapper,
-			albumRepository,
+			albumRepo,
 			songRepo,
 			resourceRepo,
-			userRepository,
-			cultureCode,
+			userRepo,
 			reportTypes,
-			loggedUserId,
 			canDeleteAllComments,
 			pvPlayersFactory,
 			latestComments,

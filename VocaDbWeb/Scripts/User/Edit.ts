@@ -2,8 +2,11 @@ import ArtistContract from '@DataContracts/Artist/ArtistContract';
 import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import { initEntrySearch } from '@Shared/EntryAutoComplete';
 import functions from '@Shared/GlobalFunctions';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import $ from 'jquery';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 function initPage(): void {
 	function artistAdded(row: any): void {
@@ -32,7 +35,7 @@ function initPage(): void {
 		createOptionSecondRow: (item: ArtistContract) => item.additionalNames!,
 		extraQueryParams: {
 			nameMatchMode: 'Auto',
-			lang: ContentLanguagePreference[vdb.values.languagePreference],
+			lang: ContentLanguagePreference[vocaDbContext.languagePreference],
 			fields: 'AdditionalNames',
 		},
 		termParamName: 'query',

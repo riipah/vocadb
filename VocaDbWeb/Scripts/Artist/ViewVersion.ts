@@ -1,9 +1,10 @@
 import ArtistRepository from '@Repositories/ArtistRepository';
-import HttpClient from '@Shared/HttpClient';
-import vdb from '@Shared/VdbStatic';
+import { container } from '@Shared/inversify.config';
 import ArchivedArtistViewModel from '@ViewModels/Artist/ArchivedArtistViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
+
+const artistRepo = container.get(ArtistRepository);
 
 const ArtistViewVersion = (model: {
 	archivedVersion: {
@@ -22,13 +23,10 @@ const ArtistViewVersion = (model: {
 		$('#showLink').button({ icons: { primary: 'ui-icon-unlocked' } });
 		$('#hideLink').button({ icons: { primary: 'ui-icon-locked' } });
 
-		const httpClient = new HttpClient();
-		var rep = new ArtistRepository(httpClient, vdb.values.baseAddress);
-
 		var viewModel = new ArchivedArtistViewModel(
 			model.artist.id,
 			model.archivedVersion.version,
-			rep,
+			artistRepo,
 		);
 		ko.applyBindings(viewModel);
 	});

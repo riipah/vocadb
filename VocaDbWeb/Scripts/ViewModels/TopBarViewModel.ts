@@ -2,7 +2,7 @@ import PartialFindResultContract from '@DataContracts/PartialFindResultContract'
 import UserMessageSummaryContract from '@DataContracts/User/UserMessageSummaryContract';
 import EntryReportRepository from '@Repositories/EntryReportRepository';
 import UserRepository from '@Repositories/UserRepository';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed, Observable } from 'knockout';
 
 // View model for the top bar.
@@ -12,7 +12,7 @@ export default class TopBarViewModel {
 
 		this.userRepository
 			.getMessageSummaries({
-				userId: vdb.values.loggedUserId,
+				userId: this.vocaDbContext.loggedUserId,
 				inbox: undefined,
 				paging: { maxEntries: 3, start: 0, getTotalCount: false },
 				unread: true,
@@ -51,6 +51,7 @@ export default class TopBarViewModel {
 	// entryReportRepository: entry reports repository.
 	// userRepository: user repository.
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		entryTypeTranslations: { [x: string]: string },
 		entryType: string,
 		searchTerm: string,

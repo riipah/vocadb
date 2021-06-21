@@ -1,7 +1,11 @@
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import TopBarViewModel from '@ViewModels/TopBarViewModel';
 
 import FakeEntryReportRepository from '../TestSupport/FakeEntryReportRepository';
 import FakeUserRepository from '../TestSupport/FakeUserRepository';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 var entryTypeTranslations: { [x: string]: string };
 var entryReportRepo: FakeEntryReportRepository;
@@ -36,6 +40,7 @@ beforeEach(() => {
 
 var create = (getNewReportsCount: boolean = false): TopBarViewModel => {
 	return new TopBarViewModel(
+		vocaDbContext,
 		entryTypeTranslations,
 		'Album',
 		'',

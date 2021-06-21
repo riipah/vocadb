@@ -5,7 +5,7 @@ import EntryType from '@Models/EntryType';
 import ArtistRepository from '@Repositories/ArtistRepository';
 import TagRepository from '@Repositories/TagRepository';
 import EntryUrlMapper from '@Shared/EntryUrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko from 'knockout';
 
 import WebLinkEditViewModel from './WebLinkEditViewModel';
@@ -27,7 +27,7 @@ export default class ArtistCreateViewModel {
 		const tag = await this.tagRepository.getEntryTypeTag({
 			entryType: EntryType.Artist,
 			subType: artistType,
-			lang: vdb.values.languagePreference,
+			lang: this.vocaDbContext.languagePreference,
 		});
 		this.artistTypeTag(tag);
 	};
@@ -46,6 +46,7 @@ export default class ArtistCreateViewModel {
 	public webLink: WebLinkEditViewModel = new WebLinkEditViewModel();
 
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		artistRepository: ArtistRepository,
 		private readonly tagRepository: TagRepository,
 		data?: { nameOriginal: string; nameRomaji: string; nameEnglish: string },

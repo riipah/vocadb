@@ -1,3 +1,4 @@
+import RepositoryParams from '@Repositories/RepositoryParams';
 import ui from '@Shared/MessagesTyped';
 import vdb from '@Shared/VdbStatic';
 
@@ -30,11 +31,12 @@ export default class ArchivedEntryViewModel {
 
 export interface IEntryReportsRepository {
 	createReport({
+		baseUrl,
 		entryId,
 		reportType,
 		notes,
 		versionNumber,
-	}: {
+	}: RepositoryParams & {
 		entryId: number;
 		reportType: string;
 		notes: string;

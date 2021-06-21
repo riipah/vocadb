@@ -6,11 +6,16 @@ import ReleaseEventRepository from '@Repositories/ReleaseEventRepository';
 import UserRepository from '@Repositories/UserRepository';
 import HttpClient from '@Shared/HttpClient';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import ReleaseEventDetailsViewModel from '@ViewModels/ReleaseEvent/ReleaseEventDetailsViewModel';
 import { IEntryReportType } from '@ViewModels/ReportEntryViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
+
+const vocaDbContext = container.get(VocaDbContext);
+const eventRepo = container.get(ReleaseEventRepository);
+const userRepo = container.get(UserRepository);
 
 const EventDetails = (
 	canDeleteAllComments: boolean,
@@ -32,24 +37,21 @@ const EventDetails = (
 		$('#reportEntryLink').button({ icons: { primary: 'ui-icon-alert' } });
 		$('#manageTags').button({ icons: { primary: 'ui-icon-wrench' } });
 
-		var loggedUserId = vdb.values.loggedUserId;
 		const httpClient = new HttpClient();
-		var rootPath = vdb.values.baseAddress;
+		var rootPath = vocaDbContext.baseAddress;
 		var urlMapper = new UrlMapper(rootPath);
-		var eventRepo = new ReleaseEventRepository(httpClient, urlMapper);
-		var userRepo = new UserRepository(httpClient, urlMapper);
 		var latestComments = model.latestComments;
 		var users = model.usersAttending;
 		var tags = model.tags;
 
 		var vm = new ReleaseEventDetailsViewModel(
+			vocaDbContext,
 			httpClient,
 			urlMapper,
 			eventRepo,
 			userRepo,
 			latestComments,
 			reportTypes,
-			loggedUserId,
 			model.id,
 			eventAssociationType,
 			users,

@@ -1,9 +1,13 @@
-import RepositoryFactory from '@Repositories/RepositoryFactory';
+import ArtistRepository from '@Repositories/ArtistRepository';
+import SongRepository from '@Repositories/SongRepository';
+import UserRepository from '@Repositories/UserRepository';
 import functions from '@Shared/GlobalFunctions';
 import HttpClient from '@Shared/HttpClient';
 import ui from '@Shared/MessagesTyped';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import { IEntryReportType } from '@ViewModels/ReportEntryViewModel';
 import SongDetailsViewModel, {
 	SongDetailsAjax,
@@ -12,6 +16,11 @@ import SongDetailsViewModel, {
 import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
+
+const vocaDbContext = container.get(VocaDbContext);
+const songRepo = container.get(SongRepository);
+const userRepo = container.get(UserRepository);
+const artistRepo = container.get(ArtistRepository);
 
 function initPage(
 	jsonModel: SongDetailsAjax,
@@ -91,30 +100,25 @@ const SongDetails = (
 	showTranslatedDescription: boolean,
 ): void => {
 	$(document).ready(function () {
-		moment.locale(vdb.values.culture);
+		moment.locale(vocaDbContext.culture);
 
 		vdb.resources.song = resources;
 
 		var jsonModel = model.jsonModel;
 		const httpClient = new HttpClient();
-		var rootPath = vdb.values.baseAddress;
+		var rootPath = vocaDbContext.baseAddress;
 		var urlMapper = new UrlMapper(rootPath);
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var repo = repoFactory.songRepository();
-		var userRepo = repoFactory.userRepository();
-		var artistRepo = repoFactory.artistRepository();
 
 		var viewModel = new SongDetailsViewModel(
+			vocaDbContext,
 			httpClient,
-			repo,
+			songRepo,
 			userRepo,
 			artistRepo,
 			resources,
 			showTranslatedDescription,
 			jsonModel,
 			reportTypes,
-			vdb.values.loggedUserId,
-			vdb.values.languagePreference,
 			canDeleteAllComments,
 			ui.showThankYouForRatingMessage,
 		);

@@ -3,8 +3,11 @@ import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePref
 import { EntryAutoCompleteParams } from '@Shared/EntryAutoComplete';
 import { initEntrySearch } from '@Shared/EntryAutoComplete';
 import functions from '@Shared/GlobalFunctions';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import ko, { Observable } from 'knockout';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 declare global {
 	interface KnockoutBindingHandlers {
@@ -21,7 +24,7 @@ ko.bindingHandlers.venueAutoComplete = {
 	): void => {
 		var queryParams = {
 			nameMatchMode: 'Auto',
-			lang: ContentLanguagePreference[vdb.values.languagePreference],
+			lang: ContentLanguagePreference[vocaDbContext.languagePreference],
 			preferAccurateMatches: true,
 			maxResults: 20,
 			sort: 'Name',

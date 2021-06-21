@@ -1,14 +1,17 @@
 import AlbumContract from '@DataContracts/Album/AlbumContract';
 import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import { initEntrySearch } from '@Shared/EntryAutoComplete';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import $ from 'jquery';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 function initPage(): void {
 	function acceptArtistSelection(albumId?: number): void {
 		$.get(
 			'../../api/albums/' + albumId,
-			{ lang: ContentLanguagePreference[vdb.values.languagePreference] },
+			{ lang: ContentLanguagePreference[vocaDbContext.languagePreference] },
 			function (album) {
 				$('#mergedAlbumId').append(
 					"<option value='" + albumId + "'>" + album.name + '</option>',
@@ -27,7 +30,7 @@ function initPage(): void {
 		createOptionSecondRow: (item: AlbumContract) => item.additionalNames,
 		extraQueryParams: {
 			nameMatchMode: 'Auto',
-			lang: ContentLanguagePreference[vdb.values.languagePreference],
+			lang: ContentLanguagePreference[vocaDbContext.languagePreference],
 		},
 		termParamName: 'query',
 	});

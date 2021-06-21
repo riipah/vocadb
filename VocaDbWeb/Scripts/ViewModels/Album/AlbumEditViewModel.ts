@@ -16,6 +16,7 @@ import UserRepository from '@Repositories/UserRepository';
 import { IDialogService } from '@Shared/DialogService';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import $ from 'jquery';
 import ko, {
 	Computed,
@@ -54,7 +55,7 @@ export default class AlbumEditViewModel {
 	public addArtist = (artistId?: number, customArtistName?: string): void => {
 		if (artistId) {
 			this.artistRepository
-				.getOne({ id: artistId, lang: vdb.values.languagePreference })
+				.getOne({ id: artistId, lang: this.vocaDbContext.languagePreference })
 				.then((artist) => {
 					var data: ArtistForAlbumContract = {
 						artist: artist,
@@ -275,6 +276,7 @@ export default class AlbumEditViewModel {
 	public validationError_unspecifiedNames: Computed<boolean>;
 
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		public repository: AlbumRepository,
 		songRepository: SongRepository,
 		private artistRepository: ArtistRepository,
@@ -338,7 +340,7 @@ export default class AlbumEditViewModel {
 					.getOneWithComponents({
 						id: songId,
 						fields: 'AdditionalNames,Artists',
-						lang: vdb.values.languagePreference,
+						lang: vocaDbContext.languagePreference,
 					})
 					.then((song) => {
 						var artists = _.filter(

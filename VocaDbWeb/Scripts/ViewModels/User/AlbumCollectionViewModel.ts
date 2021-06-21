@@ -5,12 +5,11 @@ import TagBaseContract from '@DataContracts/Tag/TagBaseContract';
 import AlbumForUserForApiContract from '@DataContracts/User/AlbumForUserForApiContract';
 import { ArtistAutoCompleteParams } from '@KnockoutExtensions/AutoCompleteParams';
 import EntryType from '@Models/EntryType';
-import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import ArtistRepository from '@Repositories/ArtistRepository';
 import ResourceRepository from '@Repositories/ResourceRepository';
 import UserRepository from '@Repositories/UserRepository';
 import EntryUrlMapper from '@Shared/EntryUrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko from 'knockout';
 import _ from 'lodash';
 
@@ -20,12 +19,11 @@ import ServerSidePagingViewModel from '../ServerSidePagingViewModel';
 
 export default class AlbumCollectionViewModel {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private userRepo: UserRepository,
 		private artistRepo: ArtistRepository,
 		private resourceRepo: ResourceRepository,
-		private lang: ContentLanguagePreference,
 		private loggedUserId: number,
-		private cultureCode: string,
 		public publicCollection: boolean,
 		initialize = true,
 	) {
@@ -92,7 +90,7 @@ export default class AlbumCollectionViewModel {
 
 		this.resourceRepo
 			.getList({
-				cultureCode: vdb.values.uiCulture,
+				cultureCode: this.vocaDbContext.uiCulture,
 				setNames: [
 					'albumCollectionStatusNames',
 					'albumMediaTypeNames',
@@ -119,7 +117,7 @@ export default class AlbumCollectionViewModel {
 		this.artistRepo
 			.getOne({
 				id: selectedArtistId!,
-				lang: vdb.values.languagePreference,
+				lang: this.vocaDbContext.languagePreference,
 			})
 			.then((artist) => this.artistName(artist.name));
 	};
@@ -142,7 +140,7 @@ export default class AlbumCollectionViewModel {
 			.getAlbumCollectionList({
 				userId: this.loggedUserId,
 				paging: pagingProperties,
-				lang: vdb.values.languagePreference,
+				lang: this.vocaDbContext.languagePreference,
 				query: this.searchTerm(),
 				tag: this.tagId()!,
 				albumType: this.albumType(),

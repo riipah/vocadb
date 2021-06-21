@@ -2,10 +2,13 @@ import AlbumContract from '@DataContracts/Album/AlbumContract';
 import ContentLanguagePreference from '@Models/Globalization/ContentLanguagePreference';
 import { initEntrySearch } from '@Shared/EntryAutoComplete';
 import functions from '@Shared/GlobalFunctions';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import ko from 'knockout';
 
 import { AlbumAutoCompleteParams } from './AutoCompleteParams';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 declare global {
 	interface KnockoutBindingHandlers {
@@ -36,7 +39,7 @@ export function albumAutoComplete(
 
 	var queryParams = {
 		nameMatchMode: 'Auto',
-		lang: ContentLanguagePreference[vdb.values.languagePreference],
+		lang: ContentLanguagePreference[vocaDbContext.languagePreference],
 		preferAccurateMatches: true,
 		maxResults: 15,
 	};

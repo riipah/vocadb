@@ -2,26 +2,22 @@ import CommentContract from '@DataContracts/CommentContract';
 import PartialFindResultContract from '@DataContracts/PartialFindResultContract';
 import EntryType from '@Models/EntryType';
 import HttpClient from '@Shared/HttpClient';
-import UrlMapper from '@Shared/UrlMapper';
 
-import BaseRepository from './BaseRepository';
+import { buildUrl, mergeUrls } from './BaseRepository';
 import ICommentRepository from './ICommentRepository';
+import RepositoryParams from './RepositoryParams';
 
-export default class CommentRepository
-	extends BaseRepository
-	implements ICommentRepository {
+export default class CommentRepository implements ICommentRepository {
 	public constructor(
 		private readonly httpClient: HttpClient,
-		private readonly urlMapper: UrlMapper,
 		private entryType: EntryType,
-	) {
-		super(urlMapper.baseUrl);
-	}
+	) {}
 
 	public createComment = ({
+		baseUrl,
 		entryId,
 		contract,
-	}: {
+	}: RepositoryParams & {
 		entryId: number;
 		contract: CommentContract;
 	}): Promise<CommentContract> => {
@@ -30,19 +26,22 @@ export default class CommentRepository
 			id: entryId,
 			name: null!,
 		};
-		var url = this.urlMapper.mapRelative(
-			UrlMapper.buildUrl(`api/comments/${EntryType[this.entryType]}-comments`),
+		var url = mergeUrls(
+			baseUrl,
+			buildUrl(`api/comments/${EntryType[this.entryType]}-comments`),
 		);
 		return this.httpClient.post<CommentContract>(url, contract);
 	};
 
 	public deleteComment = ({
+		baseUrl,
 		commentId,
-	}: {
+	}: RepositoryParams & {
 		commentId: number;
 	}): Promise<void> => {
-		var url = this.urlMapper.mapRelative(
-			UrlMapper.buildUrl(
+		var url = mergeUrls(
+			baseUrl,
+			buildUrl(
 				`api/comments/${EntryType[this.entryType]}-comments/`,
 				commentId.toString(),
 			),
@@ -51,12 +50,12 @@ export default class CommentRepository
 	};
 
 	public getComments = async ({
+		baseUrl,
 		entryId: listId,
-	}: {
-		entryId: number;
-	}): Promise<CommentContract[]> => {
-		var url = this.urlMapper.mapRelative(
-			UrlMapper.buildUrl(`api/comments/${EntryType[this.entryType]}-comments/`),
+	}: RepositoryParams & { entryId: number }): Promise<CommentContract[]> => {
+		var url = mergeUrls(
+			baseUrl,
+			buildUrl(`api/comments/${EntryType[this.entryType]}-comments/`),
 		);
 		const result = await this.httpClient.get<
 			PartialFindResultContract<CommentContract>
@@ -65,14 +64,16 @@ export default class CommentRepository
 	};
 
 	public updateComment = ({
+		baseUrl,
 		commentId,
 		contract,
-	}: {
+	}: RepositoryParams & {
 		commentId: number;
 		contract: CommentContract;
 	}): Promise<void> => {
-		var url = this.urlMapper.mapRelative(
-			UrlMapper.buildUrl(
+		var url = mergeUrls(
+			baseUrl,
+			buildUrl(
 				`api/comments/${EntryType[this.entryType]}-comments/`,
 				commentId.toString(),
 			),

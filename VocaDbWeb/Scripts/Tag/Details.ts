@@ -2,14 +2,18 @@ import CommentContract from '@DataContracts/CommentContract';
 import TagBaseContract from '@DataContracts/Tag/TagBaseContract';
 import TagRepository from '@Repositories/TagRepository';
 import UserRepository from '@Repositories/UserRepository';
-import HttpClient from '@Shared/HttpClient';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import { IEntryReportType } from '@ViewModels/ReportEntryViewModel';
 import TagDetailsViewModel from '@ViewModels/Tag/TagDetailsViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 import _ from 'lodash';
+
+const vocaDbContext = container.get(VocaDbContext);
+const tagRepo = container.get(TagRepository);
+const userRepo = container.get(UserRepository);
 
 function initChart(
 	urlMapper: UrlMapper,
@@ -256,7 +260,7 @@ const TagDetails = (
 	showTranslatedDescription: boolean,
 ): void => {
 	$(function () {
-		var urlMapper = new UrlMapper(vdb.values.baseAddress);
+		var urlMapper = new UrlMapper(vocaDbContext.baseAddress);
 		var jsonModel = model.jsonModel;
 		var vm;
 
@@ -270,17 +274,14 @@ const TagDetails = (
 			jsonModel.hasMoreChildren,
 		);
 
-		const httpClient = new HttpClient();
-		var repo = new TagRepository(httpClient, vdb.values.baseAddress);
-		var userRepo = new UserRepository(httpClient, urlMapper);
 		var latestComments = model.latestComments;
 
 		vm = new TagDetailsViewModel(
-			repo,
+			vocaDbContext,
+			tagRepo,
 			userRepo,
 			latestComments,
 			reportTypes,
-			vdb.values.loggedUserId,
 			model.id,
 			canDeleteAllComments,
 			showTranslatedDescription,

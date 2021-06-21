@@ -5,6 +5,8 @@ import SongInAlbumEditContract from '@DataContracts/Song/SongInAlbumEditContract
 import TranslatedEnumField from '@DataContracts/TranslatedEnumField';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import AlbumEditViewModel, {
 	TrackArtistSelectionViewModel,
 } from '@ViewModels/Album/AlbumEditViewModel';
@@ -16,6 +18,8 @@ import FakeAlbumRepository from '../TestSupport/FakeAlbumRepository';
 import FakeArtistRepository from '../TestSupport/FakeArtistRepository';
 import FakeSongRepository from '../TestSupport/FakeSongRepository';
 import FakeUserRepository from '../TestSupport/FakeUserRepository';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 var rep = new FakeAlbumRepository();
 var songRep: FakeSongRepository;
@@ -184,6 +188,7 @@ beforeEach(() => {
 
 function createViewModel(): AlbumEditViewModel {
 	return new AlbumEditViewModel(
+		vocaDbContext,
 		rep,
 		songRep,
 		artistRep,

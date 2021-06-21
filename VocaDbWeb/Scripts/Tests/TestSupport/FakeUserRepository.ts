@@ -3,10 +3,10 @@ import PartialFindResultContract from '@DataContracts/PartialFindResultContract'
 import UserMessageSummaryContract from '@DataContracts/User/UserMessageSummaryContract';
 import EntryType from '@Models/EntryType';
 import SongVoteRating from '@Models/SongVoteRating';
+import RepositoryParams from '@Repositories/RepositoryParams';
 import { UserInboxType } from '@Repositories/UserRepository';
 import UserRepository from '@Repositories/UserRepository';
 import HttpClient from '@Shared/HttpClient';
-import UrlMapper from '@Shared/UrlMapper';
 
 import FakePromise from './FakePromise';
 
@@ -17,24 +17,26 @@ export default class FakeUserRepository extends UserRepository {
 	public rating!: SongVoteRating;
 
 	public constructor() {
-		super(new HttpClient(), new UrlMapper(''));
+		super(new HttpClient());
 
 		this.getMessage = ({
+			baseUrl,
 			messageId,
-		}: {
+		}: RepositoryParams & {
 			messageId: number;
 		}): Promise<UserMessageSummaryContract> => {
 			return FakePromise.resolve(this.message);
 		};
 
 		this.getMessageSummaries = ({
+			baseUrl,
 			userId,
 			inbox,
 			paging,
 			unread = false,
 			anotherUserId,
 			iconSize = 40,
-		}: {
+		}: RepositoryParams & {
 			userId: number;
 			inbox?: UserInboxType;
 			paging: PagingProperties;
@@ -51,9 +53,10 @@ export default class FakeUserRepository extends UserRepository {
 		};
 
 		this.refreshEntryEdit = ({
+			baseUrl,
 			entryType,
 			entryId,
-		}: {
+		}: RepositoryParams & {
 			entryType: EntryType;
 			entryId: number;
 		}): Promise<void> => {
@@ -61,9 +64,10 @@ export default class FakeUserRepository extends UserRepository {
 		};
 
 		this.updateSongRating = ({
+			baseUrl,
 			songId,
 			rating,
-		}: {
+		}: RepositoryParams & {
 			songId: number;
 			rating: SongVoteRating;
 		}): Promise<void> => {

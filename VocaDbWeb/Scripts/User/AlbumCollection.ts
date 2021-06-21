@@ -1,10 +1,16 @@
-import RepositoryFactory from '@Repositories/RepositoryFactory';
-import HttpClient from '@Shared/HttpClient';
-import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import ArtistRepository from '@Repositories/ArtistRepository';
+import ResourceRepository from '@Repositories/ResourceRepository';
+import UserRepository from '@Repositories/UserRepository';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import AlbumCollectionViewModel from '@ViewModels/User/AlbumCollectionViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
+
+const vocaDbContext = container.get(VocaDbContext);
+const userRepo = container.get(UserRepository);
+const artistRepo = container.get(ArtistRepository);
+const resourceRepo = container.get(ResourceRepository);
 
 const UserAlbumCollection = (
 	model: {
@@ -15,25 +21,14 @@ const UserAlbumCollection = (
 	publicCollection: boolean,
 ): void => {
 	$(document).ready(function () {
-		var cultureCode = vdb.values.uiCulture;
-		var lang = vdb.values.languagePreference;
 		var loggedUserId = model.user.id;
 
-		const httpClient = new HttpClient();
-		var rootPath = vdb.values.baseAddress;
-		var urlMapper = new UrlMapper(rootPath);
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var userRepo = repoFactory.userRepository();
-		var artistRepo = repoFactory.artistRepository();
-		var resourceRepo = repoFactory.resourceRepository();
-
 		var vm = new AlbumCollectionViewModel(
+			vocaDbContext,
 			userRepo,
 			artistRepo,
 			resourceRepo,
-			lang,
 			loggedUserId,
-			cultureCode,
 			publicCollection,
 		);
 		ko.applyBindings(vm);

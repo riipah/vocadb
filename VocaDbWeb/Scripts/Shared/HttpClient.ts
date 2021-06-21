@@ -1,5 +1,7 @@
 import AjaxHelper from '@Helpers/AjaxHelper';
 import axios from 'axios';
+import { injectable } from 'inversify';
+import 'reflect-metadata';
 
 export class HeaderNames {
 	public static readonly ContentType = 'Content-Type';
@@ -22,6 +24,7 @@ export interface HttpClientError<T = ErrorResponse> extends Error {
 	response?: T;
 }
 
+@injectable()
 export default class HttpClient {
 	public delete = async <T>(url: string): Promise<T> => {
 		const response = await axios.delete<T>(url);

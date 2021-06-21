@@ -2,18 +2,22 @@ import ArtistContract from '@DataContracts/Artist/ArtistContract';
 import EntryMergeValidationHelper from '@Helpers/EntryMergeValidationHelper';
 import { ArtistAutoCompleteParams } from '@KnockoutExtensions/AutoCompleteParams';
 import ArtistRepository from '@Repositories/ArtistRepository';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko from 'knockout';
 
 import BasicEntryLinkViewModel from '../BasicEntryLinkViewModel';
 
 export default class ArtistMergeViewModel {
-	public constructor(repo: ArtistRepository, id: number) {
+	public constructor(
+		vocaDbContext: VocaDbContext,
+		repo: ArtistRepository,
+		id: number,
+	) {
 		this.target = new BasicEntryLinkViewModel<ArtistContract>(
 			null!,
 			(entryId, callback) =>
 				repo
-					.getOne({ id: entryId, lang: vdb.values.languagePreference })
+					.getOne({ id: entryId, lang: vocaDbContext.languagePreference })
 					.then(callback),
 		);
 
@@ -23,7 +27,7 @@ export default class ArtistMergeViewModel {
 		};
 
 		repo
-			.getOne({ id: id, lang: vdb.values.languagePreference })
+			.getOne({ id: id, lang: vocaDbContext.languagePreference })
 			.then((base) => {
 				ko.computed(() => {
 					var result = EntryMergeValidationHelper.validateEntry(

@@ -1,17 +1,16 @@
 import TagBaseContract from '@DataContracts/Tag/TagBaseContract';
 import TagRepository from '@Repositories/TagRepository';
-import HttpClient from '@Shared/HttpClient';
-import vdb from '@Shared/VdbStatic';
+import { container } from '@Shared/inversify.config';
 import TagMergeViewModel from '@ViewModels/Tag/TagMergeViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 
+const tagRepo = container.get(TagRepository);
+
 const TagMerge = (model: TagBaseContract): void => {
 	$(function () {
-		const httpClient = new HttpClient();
-		var repo = new TagRepository(httpClient, vdb.values.baseAddress);
 		var data = model;
-		var vm = new TagMergeViewModel(repo, data);
+		var vm = new TagMergeViewModel(tagRepo, data);
 		ko.applyBindings(vm);
 
 		$('#mergeBtn').click(function () {

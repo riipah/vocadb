@@ -1,12 +1,23 @@
-import RepositoryFactory from '@Repositories/RepositoryFactory';
-import HttpClient from '@Shared/HttpClient';
+import ArtistRepository from '@Repositories/ArtistRepository';
+import ResourceRepository from '@Repositories/ResourceRepository';
+import SongRepository from '@Repositories/SongRepository';
+import TagRepository from '@Repositories/TagRepository';
+import UserRepository from '@Repositories/UserRepository';
 import UrlMapper from '@Shared/UrlMapper';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import PVPlayersFactory from '@ViewModels/PVs/PVPlayersFactory';
 import RatedSongsSearchViewModel from '@ViewModels/User/RatedSongsSearchViewModel';
 import $ from 'jquery';
 import ko from 'knockout';
 import moment from 'moment';
+
+const vocaDbContext = container.get(VocaDbContext);
+const userRepo = container.get(UserRepository);
+const artistRepo = container.get(ArtistRepository);
+const songRepo = container.get(SongRepository);
+const resourceRepo = container.get(ResourceRepository);
+const tagRepo = container.get(TagRepository);
 
 const UserFavoriteSongs = (model: {
 	groupByRating: boolean;
@@ -16,34 +27,24 @@ const UserFavoriteSongs = (model: {
 	};
 }): void => {
 	$(function () {
-		moment.locale(vdb.values.culture);
-		var cultureCode = vdb.values.uiCulture;
-		var lang = vdb.values.languagePreference;
+		moment.locale(vocaDbContext.culture);
 		var loggedUserId = model.user.id;
 		var sort = model.sort;
 		var groupByRating = model.groupByRating;
 
-		const httpClient = new HttpClient();
-		var rootPath = vdb.values.baseAddress;
+		var rootPath = vocaDbContext.baseAddress;
 		var urlMapper = new UrlMapper(rootPath);
-		var repoFactory = new RepositoryFactory(httpClient, urlMapper);
-		var userRepo = repoFactory.userRepository();
-		var artistRepo = repoFactory.artistRepository();
-		var songRepo = repoFactory.songRepository();
-		var resourceRepo = repoFactory.resourceRepository();
-		var tagRepo = repoFactory.tagRepository();
 		var pvPlayersFactory = new PVPlayersFactory($('#pv-player-wrapper')[0]);
 
 		var vm = new RatedSongsSearchViewModel(
+			vocaDbContext,
 			urlMapper,
 			userRepo,
 			artistRepo,
 			songRepo,
 			resourceRepo,
 			tagRepo,
-			lang,
 			loggedUserId,
-			cultureCode,
 			sort,
 			groupByRating,
 			pvPlayersFactory,

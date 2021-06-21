@@ -12,6 +12,7 @@ import UserRepository from '@Repositories/UserRepository';
 import ui from '@Shared/MessagesTyped';
 import UrlMapper from '@Shared/UrlMapper';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import { Options } from 'highcharts';
 import ko, { Observable } from 'knockout';
 
@@ -27,6 +28,7 @@ import TagsEditViewModel from '../Tag/TagsEditViewModel';
 
 export default class ArtistDetailsViewModel {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		repo: ArtistRepository,
 		private artistId: number,
 		tagUsages: TagUsageForApiContract[],
@@ -35,15 +37,12 @@ export default class ArtistDetailsViewModel {
 		siteNotifications: boolean,
 		hasEnglishDescription: boolean,
 		private unknownPictureUrl: string,
-		private lang: ContentLanguagePreference,
 		private urlMapper: UrlMapper,
 		private albumRepo: AlbumRepository,
 		private songRepo: SongRepository,
 		private resourceRepo: ResourceRepository,
 		private userRepository: UserRepository,
-		private cultureCode: string,
 		reportTypes: IEntryReportType[],
-		private loggedUserId: number,
 		canDeleteAllComments: boolean,
 		private pvPlayersFactory: PVPlayersFactory,
 		latestComments: CommentContract[],
@@ -57,14 +56,16 @@ export default class ArtistDetailsViewModel {
 		);
 		this.description = new EnglishTranslatedStringViewModel(
 			hasEnglishDescription &&
-				(lang === ContentLanguagePreference.English ||
-					lang === ContentLanguagePreference.Romaji),
+				(vocaDbContext.languagePreference ===
+					ContentLanguagePreference.English ||
+					vocaDbContext.languagePreference ===
+						ContentLanguagePreference.Romaji),
 		);
 
 		this.comments = new EditableCommentsViewModel(
+			vocaDbContext,
 			repo,
 			artistId,
-			loggedUserId,
 			canDeleteAllComments,
 			canDeleteAllComments,
 			false,
@@ -182,12 +183,11 @@ export default class ArtistDetailsViewModel {
 		this.mainAlbumsViewModel(
 			new AlbumSearchViewModel(
 				null!,
+				this.vocaDbContext,
 				this.unknownPictureUrl,
-				this.lang,
 				this.albumRepo,
 				null!,
 				this.resourceRepo,
-				this.cultureCode,
 				null!,
 				[this.artistId],
 				null!,
@@ -206,12 +206,11 @@ export default class ArtistDetailsViewModel {
 		this.collaborationAlbumsViewModel(
 			new AlbumSearchViewModel(
 				null!,
+				this.vocaDbContext,
 				this.unknownPictureUrl,
-				this.lang,
 				this.albumRepo,
 				null!,
 				this.resourceRepo,
-				this.cultureCode,
 				null!,
 				[this.artistId],
 				null!,
@@ -230,15 +229,13 @@ export default class ArtistDetailsViewModel {
 		this.songsViewModel(
 			new SongSearchViewModel(
 				null!,
+				this.vocaDbContext,
 				this.urlMapper,
-				this.lang,
 				this.songRepo,
 				null!,
 				this.userRepository,
 				null!,
 				this.resourceRepo,
-				this.cultureCode,
-				this.loggedUserId,
 				null!,
 				[this.artistId],
 				null!,

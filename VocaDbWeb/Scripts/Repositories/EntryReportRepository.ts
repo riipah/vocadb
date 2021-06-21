@@ -1,15 +1,18 @@
 import HttpClient from '@Shared/HttpClient';
-import UrlMapper from '@Shared/UrlMapper';
+import { injectable } from 'inversify';
+import 'reflect-metadata';
 
+import { mergeUrls } from './BaseRepository';
+import RepositoryParams from './RepositoryParams';
+
+@injectable()
 export default class EntryReportRepository {
-	public constructor(
-		private readonly httpClient: HttpClient,
-		private readonly urlMapper: UrlMapper,
-	) {}
+	public constructor(private readonly httpClient: HttpClient) {}
 
-	// eslint-disable-next-line no-empty-pattern
-	public getNewReportCount = ({}: {}): Promise<number> => {
-		var url = this.urlMapper.mapRelative('/entryReports/newReportsCount');
+	public getNewReportCount = ({
+		baseUrl,
+	}: RepositoryParams & {}): Promise<number> => {
+		var url = mergeUrls(baseUrl, '/entryReports/newReportsCount');
 		return this.httpClient.get<number>(url);
 	};
 }

@@ -2,14 +2,15 @@ import DiscussionFolderContract from '@DataContracts/Discussion/DiscussionFolder
 import DiscussionTopicContract from '@DataContracts/Discussion/DiscussionTopicContract';
 import UserApiContract from '@DataContracts/User/UserApiContract';
 import DiscussionRepository from '@Repositories/DiscussionRepository';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Observable } from 'knockout';
 
 import EditableCommentsViewModel from '../EditableCommentsViewModel';
 
 export default class DiscussionTopicViewModel {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private repo: DiscussionRepository,
-		private loggedUserId: number,
 		canDeleteAllComments: boolean,
 		contract: DiscussionTopicContract,
 		private folders: DiscussionFolderContract[],
@@ -17,9 +18,9 @@ export default class DiscussionTopicViewModel {
 		this.contract = ko.observable(contract);
 
 		this.comments = new EditableCommentsViewModel(
+			vocaDbContext,
 			repo,
 			contract.id,
-			loggedUserId,
 			canDeleteAllComments,
 			canDeleteAllComments,
 			true,
@@ -30,7 +31,7 @@ export default class DiscussionTopicViewModel {
 	public beginEditTopic = (): void => {
 		this.editModel(
 			new DiscussionTopicEditViewModel(
-				this.loggedUserId,
+				this.vocaDbContext,
 				this.folders,
 				this.contract(),
 			),
@@ -70,11 +71,11 @@ export default class DiscussionTopicViewModel {
 
 export class DiscussionTopicEditViewModel {
 	public constructor(
-		userId: number,
+		vocaDbContext: VocaDbContext,
 		public folders: DiscussionFolderContract[],
 		contract?: DiscussionTopicContract,
 	) {
-		this.author = { id: userId, name: '' };
+		this.author = { id: vocaDbContext.loggedUserId, name: '' };
 
 		if (contract) {
 			this.author = contract.author;

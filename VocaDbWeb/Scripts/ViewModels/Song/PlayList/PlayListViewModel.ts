@@ -10,6 +10,7 @@ import PVServiceIcons from '@Models/PVServiceIcons';
 import SongRepository from '@Repositories/SongRepository';
 import UserRepository from '@Repositories/UserRepository';
 import UrlMapper from '@Shared/UrlMapper';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Computed } from 'knockout';
 import _ from 'lodash';
 
@@ -19,12 +20,12 @@ import ServerSidePagingViewModel from '../../ServerSidePagingViewModel';
 
 export default class PlayListViewModel {
 	public constructor(
+		private readonly vocaDbContext: VocaDbContext,
 		private urlMapper: UrlMapper,
 		private songListRepo: IPlayListRepository,
 		private songRepo: SongRepository,
 		private userRepo: UserRepository,
 		private pvPlayerViewModel: PVPlayerViewModel,
-		private lang: ContentLanguagePreference,
 	) {
 		pvPlayerViewModel.nextSong = this.nextSong;
 		pvPlayerViewModel.resetSong = (): void => {
@@ -177,7 +178,7 @@ export default class PlayListViewModel {
 				SongOptionalField.AdditionalNames,
 				SongOptionalField.ThumbUrl,
 			),
-			this.lang,
+			this.vocaDbContext.languagePreference,
 			(result: PartialFindResultContract<ISongForPlayList>) => {
 				this.pauseNotifications = false;
 

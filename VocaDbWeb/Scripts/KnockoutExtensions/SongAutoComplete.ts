@@ -6,8 +6,11 @@ import NameMatchMode from '@Models/NameMatchMode';
 import { SongQueryParams } from '@Repositories/SongRepository';
 import { initEntrySearch } from '@Shared/EntryAutoComplete';
 import functions from '@Shared/GlobalFunctions';
-import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
+import { container } from '@Shared/inversify.config';
 import ko from 'knockout';
+
+const vocaDbContext = container.get(VocaDbContext);
 
 declare global {
 	interface KnockoutBindingHandlers {
@@ -38,7 +41,7 @@ export function songAutoComplete(
 
 	var queryParams = {
 		nameMatchMode: NameMatchMode[NameMatchMode.Auto],
-		lang: ContentLanguagePreference[vdb.values.languagePreference],
+		lang: ContentLanguagePreference[vocaDbContext.languagePreference],
 		preferAccurateMatches: true,
 	};
 	if (properties.extraQueryParams)

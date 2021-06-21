@@ -3,6 +3,7 @@ import TagRepository from '@Repositories/TagRepository';
 import UserRepository from '@Repositories/UserRepository';
 import ui from '@Shared/MessagesTyped';
 import vdb from '@Shared/VdbStatic';
+import VocaDbContext from '@Shared/VocaDbContext';
 import ko, { Observable } from 'knockout';
 
 import EditableCommentsViewModel from '../EditableCommentsViewModel';
@@ -12,20 +13,20 @@ import ReportEntryViewModel from '../ReportEntryViewModel';
 
 export default class TagDetailsViewModel {
 	public constructor(
+		vocaDbContext: VocaDbContext,
 		repo: TagRepository,
 		private userRepo: UserRepository,
 		latestComments: CommentContract[],
 		reportTypes: IEntryReportType[],
-		loggedUserId: number,
 		private tagId: number,
 		canDeleteAllComments: boolean,
 		showTranslatedDescription: boolean,
 		isFollowed: boolean,
 	) {
 		this.comments = new EditableCommentsViewModel(
+			vocaDbContext,
 			repo.getComments({}),
 			tagId,
-			loggedUserId,
 			canDeleteAllComments,
 			canDeleteAllComments,
 			false,
@@ -51,7 +52,7 @@ export default class TagDetailsViewModel {
 			showTranslatedDescription,
 		);
 		this.isFollowed = ko.observable(isFollowed);
-		this.isLoggedIn = !!loggedUserId;
+		this.isLoggedIn = !!vocaDbContext.loggedUserId;
 	}
 
 	public comments: EditableCommentsViewModel;
