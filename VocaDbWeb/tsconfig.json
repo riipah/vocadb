@@ -19,7 +19,9 @@
 			"@Shared/*": ["Scripts/Shared/*"],
 			"@ViewModels/*": ["Scripts/ViewModels/*"]
 		},
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true
 	},
 	"include": ["Scripts/**/*"]
 }

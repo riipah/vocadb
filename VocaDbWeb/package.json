@@ -49,6 +49,7 @@
         "bootstrap-sass": "^2.3.2",
         "decimal.js-light": "^2.5.1",
         "highcharts": "^9.1.0",
+        "inversify": "^5.1.1",
         "jquery": "^2.2.1",
         "jquery-ui": "^1.10.4",
         "knockout": "^3.5.1",
@@ -56,6 +57,7 @@
         "lodash": "^4.17.19",
         "marked": "^0.3.18",
         "moment": "^2.17.0",
-        "qtip2": "^3.0.3"
+        "qtip2": "^3.0.3",
+        "reflect-metadata": "^0.1.13"
     }
 }
