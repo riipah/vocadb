@@ -62,7 +62,7 @@ const globalSearchBoxSource = (
 		}
 	})();
 
-	if (!endpoint) return Promise.resolve([]);
+	if (!endpoint) return Promise.reject();
 
 	return httpClient.get<string[]>(endpoint, { query: query });
 };
