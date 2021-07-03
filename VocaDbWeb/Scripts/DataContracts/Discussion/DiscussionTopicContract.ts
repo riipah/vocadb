@@ -20,6 +20,8 @@ export default interface DiscussionTopicContract {
 
 	id: number;
 
+	lastComment?: CommentContract;
+
 	lastCommentDate: Date;
 
 	locked: boolean;

@@ -1,6 +1,7 @@
 import LoginManager from '@Models/LoginManager';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 const loginManager = new LoginManager(vdb.values);
 
@@ -97,7 +98,7 @@ const MainNavigationItems = React.memo(
 					<a href={'/Help'}>{t('ViewRes:Layout.Help')}</a>
 				</li>
 				<li>
-					<a href={'/Discussion'}>{t('ViewRes:Layout.Discussions')}</a>
+					<Link to="/discussion">{t('ViewRes:Layout.Discussions')}</Link>
 				</li>
 				<li>
 					<a href="https://wiki.vocadb.net/">{t('ViewRes:Layout.Wiki')}</a>

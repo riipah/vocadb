@@ -6,9 +6,9 @@ namespace VocaDb.Web.Controllers
 {
 	public class DiscussionController : Controller
 	{
-		public ActionResult Index()
+		/*public ActionResult Index()
 		{
 			return View();
-		}
+		}*/
 	}
 }
