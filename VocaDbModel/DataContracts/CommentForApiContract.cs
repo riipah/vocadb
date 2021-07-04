@@ -18,7 +18,7 @@ namespace VocaDb.Model.DataContracts
 			ParamIs.NotNull(() => comment);
 
 			Author = comment.Author != null ? new UserForApiContract(comment.Author, iconFactory, UserOptionalFields.MainPicture) : null;
-			AuthorName = comment.AuthorName;
+			AuthorName = comment.Author?.Name;
 			Created = comment.Created.ToUniversalTime();
 			Id = comment.Id;
 			Message = (includeMessage ? comment.Message : null);
