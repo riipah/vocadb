@@ -19,7 +19,7 @@ namespace VocaDb.Model.Service.QueryableExtensions
 		{
 			AlbumSortRule.Name => OrderByAlbumName(query, languagePreference),
 			AlbumSortRule.CollectionCount => query.OrderByDescending(a => a.Album.UserCollections.Count),
-			AlbumSortRule.ReleaseDate => query.WhereHasReleaseDate().OrderByReleaseDate(),
+			AlbumSortRule.ReleaseDate => query.WhereHasReleaseYear().OrderByReleaseDate(),
 			AlbumSortRule.ReleaseDateWithNulls => query.OrderByReleaseDate(),
 			AlbumSortRule.AdditionDate => query.OrderByDescending(a => a.Album.CreateDate),
 			AlbumSortRule.RatingAverage => query.OrderByDescending(a => a.Album.RatingAverageInt).ThenByDescending(a => a.Album.RatingCount),
@@ -153,6 +153,10 @@ namespace VocaDb.Model.Service.QueryableExtensions
 			return criteria.Where(a => a.Album.OriginalRelease.ReleaseDate.Year != null
 				&& a.Album.OriginalRelease.ReleaseDate.Month != null
 				&& a.Album.OriginalRelease.ReleaseDate.Day != null);
+		}
+		public static IQueryable<AlbumForUser> WhereHasReleaseYear(this IQueryable<AlbumForUser> criteria)
+		{
+			return criteria.Where(a => a.Album.OriginalRelease.ReleaseDate.Year != null);
 		}
 
 		public static IQueryable<AlbumForUser> WhereHasReleaseEvent(this IQueryable<AlbumForUser> query, int releaseEventId)

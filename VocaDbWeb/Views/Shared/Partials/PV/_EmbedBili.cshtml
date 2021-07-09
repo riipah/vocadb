@@ -1,4 +1,4 @@
-﻿@using VocaDb.Model.Service.VideoServices
+@using VocaDb.Model.Service.VideoServices
 @using VocaDb.Web.Models.Shared.Partials.PV
 @model EmbedBiliViewModel
 
@@ -11,7 +11,7 @@
 {
 	var unmaskedHeight = Model.Height + 67;
 	var unmaskedHeightStr = (Model.Height > 0 ? unmaskedHeight.ToString() : "");
-	<div style="overflow:hidden; width:max-content; height:max-content"><iframe src="https://player.bilibili.com/player.html?aid=@Model.PV.PVId&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="@widthStr" height="@unmaskedHeightStr" style="margin-bottom:-38px; width:@(widthStr)px; height:@(unmaskedHeightStr)px"></iframe></div>
+	<div style="overflow:hidden; width:max-content; height:max-content"><iframe src="https://player.bilibili.com/player.html?aid=@Model.PV.PVId&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="@widthStr" height="@unmaskedHeightStr" style="margin-bottom:-43px; width:@(widthStr)px; height:@(unmaskedHeightStr)px"></iframe></div>
 }
 else
 {
