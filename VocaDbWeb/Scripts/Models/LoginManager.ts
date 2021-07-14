@@ -78,6 +78,10 @@ export default class LoginManager {
 		return this.hasPermission(PermissionToken.BulkDeletePVs);
 	}
 
+	public get canCreateComments(): boolean {
+		return this.hasPermission(PermissionToken.CreateComments);
+	}
+
 	public get canDeleteComments(): boolean {
 		return this.hasPermission(PermissionToken.DeleteComments);
 	}
