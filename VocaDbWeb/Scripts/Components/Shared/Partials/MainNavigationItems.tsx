@@ -115,7 +115,7 @@ const MainNavigationItems = React.memo(
 				)}
 				{loginManager.canAccessManageMenu && (
 					<li>
-						<a href={'/Admin'}>{t('ViewRes:Layout.Manage')}</a>
+						<Link to="/Admin">{t('ViewRes:Layout.Manage')}</Link>
 					</li>
 				)}
 				{!vdb.values.isLoggedIn && (

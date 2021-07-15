@@ -74,6 +74,10 @@ export default class LoginManager {
 		return this.hasPermission(PermissionToken.AccessManageMenu);
 	}
 
+	public get canAdmin(): boolean {
+		return this.hasPermission(PermissionToken.Admin);
+	}
+
 	public get canBulkDeletePVs(): boolean {
 		return this.hasPermission(PermissionToken.BulkDeletePVs);
 	}
@@ -90,7 +94,27 @@ export default class LoginManager {
 		return this.hasPermission(PermissionToken.ManageEntryReports);
 	}
 
+	public get canManageIPRules(): boolean {
+		return this.hasPermission(PermissionToken.ManageIPRules);
+	}
+
+	public get canManageTagMappings(): boolean {
+		return this.hasPermission(PermissionToken.ManageTagMappings);
+	}
+
 	public get canMikuDbImport(): boolean {
 		return this.hasPermission(PermissionToken.MikuDbImport);
+	}
+
+	public get canMoveToTrash(): boolean {
+		return this.hasPermission(PermissionToken.MoveToTrash);
+	}
+
+	public get canViewAuditLog(): boolean {
+		return this.hasPermission(PermissionToken.ViewAuditLog);
+	}
+
+	public get canManageWebhooks(): boolean {
+		return this.hasPermission(PermissionToken.ManageWebhooks);
 	}
 }
