@@ -100,7 +100,7 @@ const MainNavigationItems = React.memo(
 					<a href={'/Help'}>{t('ViewRes:Layout.Help')}</a>
 				</li>
 				<li>
-					<a href={'/Discussion'}>{t('ViewRes:Layout.Discussions')}</a>
+					<Link to="/discussion">{t('ViewRes:Layout.Discussions')}</Link>
 				</li>
 				<li>
 					<a href="https://wiki.vocadb.net/">{t('ViewRes:Layout.Wiki')}</a>

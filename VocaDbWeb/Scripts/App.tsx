@@ -14,6 +14,9 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import './i18n';
 
+const DiscussionRoutes = React.lazy(
+	() => import('@Components/Discussion/DiscussionRoutes'),
+);
 const ErrorNotFound = React.lazy(
 	() => import('@Components/Error/ErrorNotFound'),
 );
@@ -45,6 +48,7 @@ const App = (): React.ReactElement => {
 					<div className="span10 rightFrame well">
 						<React.Suspense fallback={null /* TODO */}>
 							<Routes>
+								<Route path="/discussion/*" element={<DiscussionRoutes />} />
 								<Route path="/Stats/*" element={<StatsRoutes />} />
 								<Route path="/User/*" element={<UserRoutes />} />
 								<Route path="/*" element={<ErrorNotFound />} />

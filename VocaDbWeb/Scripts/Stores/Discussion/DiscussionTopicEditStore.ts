@@ -13,6 +13,9 @@ export default class DiscussionTopicEditStore {
 	};
 
 	@observable public folderId?: number = undefined;
+	@action public setFolderId = (value?: number): void => {
+		this.folderId = value;
+	};
 
 	@observable public locked = false;
 	@action public setLocked = (value: boolean): void => {
